@@ -7,24 +7,24 @@ import { useNavigate } from "react-router-dom";
 function Login() {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
-  const  handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     const params = new URLSearchParams();
-    params.append("username", email);
+    params.append("username", username);
     params.append("password", password);
 
     try {
-      const response = await axios.post("http://localhost:8080/login", params, { withCredentials: true });
-      // auth.login(response.data.token);
-      // navigate(from, { replace: true });
+      const response = await axios.post("http://localhost:8080/login", params, {
+        withCredentials: true,
+      });
       setAlertMessage("Login successful!");
       setAlertType("success");
       navigate("/home");
@@ -34,19 +34,13 @@ function Login() {
     }
   };
 
-  const validateEmail = (email) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
   const validatePassword = (password) => {
     return password.length >= 1;
   };
 
-  const handleEmailChange = (e) => {
+  const handleUsernameChange = (e) => {
     const value = e.target.value;
-    setEmail(value);
-    setIsEmailValid(validateEmail(value));
+    setUsername(value);
   };
 
   const handlePasswordChange = (e) => {
@@ -95,16 +89,14 @@ function Login() {
             <h1 className="display-6 mb-4 fw-normal text-center">Login</h1>
 
             <div className="mb-3">
-              <label className="form-label">Email</label>
+              <label className="form-label">Username</label>
               <div className="input-group">
                 <input
-                  type="email"
-                  className={`form-control ${
-                    email ? (isEmailValid ? "is-valid" : "is-invalid") : ""
-                  }`}
-                  id="email"
-                  value={email}
-                  onChange={handleEmailChange}
+                  type="username"
+                  className={`form-control`}
+                  id="username"
+                  value={username}
+                  onChange={handleUsernameChange}
                 />
                 <span className="input-group-text">
                   <i className="bi bi-envelope"></i>

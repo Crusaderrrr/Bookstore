@@ -26,15 +26,18 @@ public class MyUserDetailsServiceImpl implements MyUserDetailsService{
   }
 
   @Override
-  public MyUserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    Optional<User> user = userRepo.findByEmail(email);
+  public MyUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    Optional<User> user = userRepo.findUserByUsername(username);
     
-    return user.map(MyUserDetails::new).orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found"));
+    return user.map(MyUserDetails::new).orElseThrow(() -> new UsernameNotFoundException(username + " not found"));
   }
 
   @Override
   public User createUser(User user) {
-    if (userRepo.findByEmail(user.getEmail()).isPresent()) {
+    if (userRepo.findUserByUsername(user.getUsername()).isPresent()) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Username " + user.getUsername() + " is already in use.");
+    }
+    if (userRepo.findUserByEmail(user.getEmail()).isPresent()) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email " + user.getEmail() + " is already in use.");
     }
     if (user.getRoles() == null || user.getRoles().isEmpty()) {
