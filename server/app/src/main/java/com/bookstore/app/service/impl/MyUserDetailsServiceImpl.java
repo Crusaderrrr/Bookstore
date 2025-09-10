@@ -2,15 +2,14 @@ package com.bookstore.app.service.impl;
 
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.bookstore.app.model.MyUserDetails;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.UserRepo;
+import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.MyUserDetailsService;
 
 @Service
@@ -19,8 +18,7 @@ public class MyUserDetailsServiceImpl implements MyUserDetailsService{
   private final UserRepo userRepo;
   private final PasswordEncoder passwordEncoder;
 
-
-  public MyUserDetailsServiceImpl(UserRepo userRepo, PasswordEncoder passwordEncoder) {
+  public MyUserDetailsServiceImpl(UserRepo userRepo, PasswordEncoder passwordEncoder, JWTService jwtService) {
     this.userRepo = userRepo;
     this.passwordEncoder = passwordEncoder;
   }
@@ -28,23 +26,9 @@ public class MyUserDetailsServiceImpl implements MyUserDetailsService{
   @Override
   public MyUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Optional<User> user = userRepo.findUserByUsername(username);
+    System.out.println("Searching for user by username");
     
     return user.map(MyUserDetails::new).orElseThrow(() -> new UsernameNotFoundException(username + " not found"));
   }
 
-  @Override
-  public User createUser(User user) {
-    if (userRepo.findUserByUsername(user.getUsername()).isPresent()) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Username " + user.getUsername() + " is already in use.");
-    }
-    if (userRepo.findUserByEmail(user.getEmail()).isPresent()) {
-      throw new ResponseStatusException(HttpStatus.CONFLICT, "Email " + user.getEmail() + " is already in use.");
-    }
-    if (user.getRoles() == null || user.getRoles().isEmpty()) {
-      user.setRoles("USER");
-    }
-    user.setActive(true);
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-    return userRepo.save(user);
-  }
 }

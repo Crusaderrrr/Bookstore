@@ -34,7 +34,7 @@ public class SecurityConfig {
         .cors(withDefaults())
         .authenticationProvider(authenticationProvider)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/hello", "/users", "/login", "/users/register").permitAll()
+            .requestMatchers("/hello", "/users", "/users/login", "/users/register").permitAll()
             .anyRequest().authenticated()
         )
         .formLogin(form -> form
@@ -50,6 +50,12 @@ public class SecurityConfig {
         .logout(logout -> logout.permitAll());
     return http.build();
   }
+
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    return config.getAuthenticationManager();
+  }
+
 
   @Bean
   public PasswordEncoder passwordEncoder() {
