@@ -1,5 +1,8 @@
 package com.bookstore.app.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +26,10 @@ public class UserController {
   @PostMapping("/login")
   public String login(@RequestBody User user) {
     return authService.verify(user);
+  }
+
+  @GetMapping("/all") 
+  public List<User> getAllUsers() {
+    return userDetailsService.getAllUsers();
   }
 }

@@ -1,5 +1,6 @@
 package com.bookstore.app.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,6 +30,10 @@ public class MyUserDetailsServiceImpl implements MyUserDetailsService{
     System.out.println("Searching for user by username");
     
     return user.map(MyUserDetails::new).orElseThrow(() -> new UsernameNotFoundException(username + " not found"));
+  }
+
+  public List<User> getAllUsers() {
+    return userRepo.findAll();
   }
 
 }

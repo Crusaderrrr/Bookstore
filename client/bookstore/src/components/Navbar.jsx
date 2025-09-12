@@ -13,7 +13,7 @@ export default function AppNavbar() {
   return (
     <Navbar bg={theme} variant={theme} expand="lg">
       <Container fluid>
-        <Navbar.Brand as={Link} to="/home">
+        <Navbar.Brand as={Link} to="/">
           Bookstore
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
@@ -23,7 +23,7 @@ export default function AppNavbar() {
             style={{ maxHeight: "100px" }}
             navbarScroll
           >
-            <Nav.Link as={Link} to="/home">
+            <Nav.Link as={Link} to="/">
               Home
             </Nav.Link>
             <Nav.Link as={Link} to="/shop">
