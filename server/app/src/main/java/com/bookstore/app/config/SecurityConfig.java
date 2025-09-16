@@ -42,18 +42,9 @@ public class SecurityConfig {
         .cors(withDefaults())
         .authenticationProvider(authenticationProvider)
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/hello", "/users", "/users/login", "/users/register").permitAll()
+            .requestMatchers("/hello", "/users", "/users/login", "/users/register", "/users/new").permitAll()
             .anyRequest().authenticated()
         )
-        .formLogin(form -> form
-          .loginProcessingUrl("/login") 
-          .successHandler((request, response, authentication) -> {
-            response.setStatus(HttpServletResponse.SC_OK); 
-          })
-          .failureHandler((request, response, exception) -> {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); 
-          })
-          .permitAll())
         .httpBasic(withDefaults())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(logout -> logout.permitAll());
