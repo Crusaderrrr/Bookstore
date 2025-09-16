@@ -1,25 +1,19 @@
 package com.bookstore.app.controller;
 
-import java.util.List;
-
+import com.bookstore.app.model.AuthResponse;
+import com.bookstore.app.model.User;
+import com.bookstore.app.service.AuthService;
+import com.bookstore.app.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.bookstore.app.model.AuthResponse;
-import com.bookstore.app.model.User;
-import com.bookstore.app.repo.UserRepo;
-import com.bookstore.app.service.AuthService;
-import com.bookstore.app.service.UserService;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/users")
@@ -29,7 +23,6 @@ public class UserController {
 
   @Value("${app.jwtRefreshExpirationMs}")
   private Long refreshTokenDurationMs;
-
 
   public UserController(UserService userService, AuthService authService) {
     this.userService = userService;
@@ -41,7 +34,7 @@ public class UserController {
     AuthResponse authResponse = authService.verify(user);
     Cookie refreshCookie = new Cookie("refreshToken", authResponse.getRefreshToken());
     refreshCookie.setHttpOnly(true);
-    refreshCookie.setSecure(true);  
+    refreshCookie.setSecure(true);
     refreshCookie.setPath("/");
     refreshCookie.setMaxAge(refreshTokenDurationMs.intValue() / 1000);
     response.addCookie(refreshCookie);
@@ -49,7 +42,7 @@ public class UserController {
   }
 
   @GetMapping("/all")
-  @PreAuthorize("isAuthenticated()") 
+  @PreAuthorize("isAuthenticated()")
   public Iterable<User> getAllUsers() {
     return userService.getAllUsers();
   }

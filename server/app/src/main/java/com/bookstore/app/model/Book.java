@@ -1,9 +1,5 @@
 package com.bookstore.app.model;
 
-import java.time.LocalDate;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -11,14 +7,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Data
 @Table(name = "books")
 public class Book {
-  @Id  @GeneratedValue
-  private Long id;
+  @Id @GeneratedValue private Long id;
 
   @NotBlank(message = "Title is required")
   private String title;
@@ -32,6 +29,5 @@ public class Book {
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate datePosted;
 
-  @ManyToOne
-  private User author;
+  @ManyToOne private User author;
 }

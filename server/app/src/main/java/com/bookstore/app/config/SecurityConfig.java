@@ -1,7 +1,9 @@
 package com.bookstore.app.config;
 
-import java.util.Arrays;
+import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.bookstore.app.filter.JwtFilter;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,30 +23,26 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.bookstore.app.filter.JwtFilter;
-
-import jakarta.servlet.http.HttpServletResponse;
-
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  @Autowired
-  private JwtFilter jwtFilter;
+  @Autowired private JwtFilter jwtFilter;
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
-    http
-      .csrf(customizer -> customizer.disable())
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
+    http.csrf(customizer -> customizer.disable())
         .cors(withDefaults())
         .authenticationProvider(authenticationProvider)
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/hello", "/users", "/users/login", "/users/register", "/users/new").permitAll()
-            .anyRequest().authenticated()
-        )
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(
+                        "/hello", "/users", "/users/login", "/users/register", "/users/new")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .httpBasic(withDefaults())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(logout -> logout.permitAll());
@@ -52,10 +50,10 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+      throws Exception {
     return config.getAuthenticationManager();
   }
-
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -63,7 +61,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+  public AuthenticationProvider authenticationProvider(
+      UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
     provider.setUserDetailsService(userDetailsService);
     provider.setPasswordEncoder(passwordEncoder);

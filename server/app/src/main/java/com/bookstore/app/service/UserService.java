@@ -1,10 +1,9 @@
 package com.bookstore.app.service;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.UserRepo;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {

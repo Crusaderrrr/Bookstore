@@ -1,10 +1,9 @@
 package com.bookstore.app.service;
 
-import org.springframework.stereotype.Service;
-
 import com.bookstore.app.model.Book;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.BookRepo;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BookService {
@@ -29,5 +28,4 @@ public class BookService {
   public Iterable<Book> getAllBooks() {
     return bookRepo.findAll();
   }
-
 }

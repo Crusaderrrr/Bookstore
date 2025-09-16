@@ -1,16 +1,14 @@
 package com.bookstore.app.controller;
 
+import com.bookstore.app.model.Book;
+import com.bookstore.app.service.BookService;
 import java.security.Principal;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.bookstore.app.model.Book;
-import com.bookstore.app.service.BookService;
 
 @RestController
 @RequestMapping("/books")
@@ -31,5 +29,4 @@ public class BookController {
     bookService.saveBook(book, principal.getName());
     return ResponseEntity.ok("Book created");
   }
-
 }
