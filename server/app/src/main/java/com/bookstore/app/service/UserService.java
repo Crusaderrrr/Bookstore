@@ -1,5 +1,6 @@
 package com.bookstore.app.service;
 
+import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.UserRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,8 +20,13 @@ public class UserService {
     return userRepo.findUserByUsername(username).get();
   }
 
-  public User saveUser(User user) {
-    user.setPassword(pswEncoder.encode(user.getPassword()));
+  public User saveUser(UserDTO userDTO) {
+    User user = new User();
+    user.setUsername(userDTO.getUsername());
+    user.setEmail(userDTO.getEmail());
+    user.setRoles(userDTO.getRoles());
+    user.setActive(userDTO.isActive());
+    user.setPassword(pswEncoder.encode(userDTO.getPassword()));
     return userRepo.save(user);
   }
 

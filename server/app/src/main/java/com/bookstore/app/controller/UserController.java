@@ -1,11 +1,13 @@
 package com.bookstore.app.controller;
 
+import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.AuthResponse;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.AuthService;
 import com.bookstore.app.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,7 +50,7 @@ public class UserController {
   }
 
   @PostMapping("/new")
-  public ResponseEntity<String> newUser(@RequestBody User user) {
+  public ResponseEntity<String> newUser(@Valid @RequestBody UserDTO user) {
     userService.saveUser(user);
     return ResponseEntity.ok("User created");
   }
