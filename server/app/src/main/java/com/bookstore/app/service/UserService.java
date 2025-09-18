@@ -16,7 +16,7 @@ public class UserService {
     this.pswEncoder = pswEncoder;
   }
 
-  public User findUserByUsername(String username) {
+  public User findByUsername(String username) {
     return userRepo.findUserByUsername(username).get();
   }
 

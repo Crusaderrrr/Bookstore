@@ -3,7 +3,6 @@ package com.bookstore.app.service;
 import com.bookstore.app.model.RefreshToken;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.RefreshTokenRepository;
-import com.bookstore.app.repo.UserRepo;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,19 +19,17 @@ public class RefreshService {
 
   @Autowired private RefreshTokenRepository refreshTokenRepository;
 
-  @Autowired private UserRepo userRepository;
+  @Autowired private UserService userService;
 
   public RefreshService() { }
 
   @Transactional
   public RefreshToken createRefreshToken(String username) {
-    User user =
-        userRepository
-            .findUserByUsername(username)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User not found with name " + username));
+    User user = userService.findByUsername(username);
+    if (user == null) {
+      throw new ResponseStatusException(
+          HttpStatus.NOT_FOUND, "User not found with name " + username);
+    }
 
     refreshTokenRepository.deleteByUser(user);
     refreshTokenRepository.flush();
@@ -56,7 +53,7 @@ public class RefreshService {
 
   @Transactional
   public void delete(String username) {
-    User user = userRepository.findUserByUsername(username).get();
+    User user = userService.findByUsername(username);
     refreshTokenRepository.deleteByUser(user);
   }
 }

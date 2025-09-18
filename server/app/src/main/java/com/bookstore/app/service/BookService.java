@@ -16,7 +16,7 @@ public class BookService {
   }
 
   public Book saveBook(Book book, String username) {
-    User author = userService.findUserByUsername(username);
+    User author = userService.findByUsername(username);
     book.setAuthor(author);
     return bookRepo.save(book);
   }
