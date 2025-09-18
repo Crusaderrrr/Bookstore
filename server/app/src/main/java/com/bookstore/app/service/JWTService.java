@@ -9,13 +9,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JWTService {
 
-  private String secretKey = "9t4k+N1v8VzW9sz6Z+xY0Q7j36LmVmriYqvfrHDLncA=";
+  @Value("${JWT_SECRET_KEY}")
+  private String secretKey;
 
   public String generateToken(String username) {
     Map<String, Object> claims = new HashMap<>();

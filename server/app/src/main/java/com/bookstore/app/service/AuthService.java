@@ -29,6 +29,7 @@ public class AuthService {
             new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
     if (authentication.isAuthenticated()) {
       String accessToken = jwtService.generateToken(user.getUsername());
+
       RefreshToken refToken = refreshService.createRefreshToken(user.getUsername());
       return new AuthResponse(accessToken, refToken.getToken());
     } else {

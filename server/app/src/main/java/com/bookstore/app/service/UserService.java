@@ -1,6 +1,7 @@
 package com.bookstore.app.service;
 
 import com.bookstore.app.dto.UserDTO;
+import com.bookstore.app.exception.UserAlreadyExistsException;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.UserRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,10 @@ public class UserService {
   }
 
   public User saveUser(UserDTO userDTO) {
+    if (userRepo.findUserByUsername(userDTO.getUsername()).isPresent()) {
+      throw new UserAlreadyExistsException(
+          "User with name " + userDTO.getUsername() + " already exists");
+    }
     User user = new User();
     user.setUsername(userDTO.getUsername());
     user.setEmail(userDTO.getEmail());

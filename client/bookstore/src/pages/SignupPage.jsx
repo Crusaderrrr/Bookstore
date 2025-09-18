@@ -1,15 +1,23 @@
 import React, { useState } from "react";
 import axios from "axios";
 import backgroundImage from "../assets/background_image.webp";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Alert,
+  InputGroup,
+} from "react-bootstrap";
 
 function SignupPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
@@ -17,22 +25,30 @@ function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setAlertMessage("");
+    setAlertType("");
 
     try {
-      const response = await axios.post("http://localhost:8080/users/register", {
-        username,
-        password,
-        email,
-      }, {
-        withCredentials: true,
-      }, { headers: { 'Content-Type': 'application/json' } });
-      console.log(response);
+      const response = await axios.post(
+        "http://localhost:8080/users/new",
+        {
+          username,
+          password,
+          email,
+          roles: "USER",
+          active: true
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      localStorage.setItem("accessToken", response.data.accessToken);
       setAlertMessage("Signup successful!");
       setAlertType("success");
-      navigate("/home");
+      navigate("/");
     } catch (err) {
-      setError("Invalid username or password. Please try again.");
+      console.error(err);
+      setAlertMessage("Error");
       setAlertType("danger");
     }
   };
@@ -43,7 +59,12 @@ function SignupPage() {
   };
 
   const validatePassword = (password) => {
-    return password.length >= 1;
+    return (
+      password.length >= 8 &&
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password) &&
+      /[0-9]/.test(password)
+    );
   };
 
   const handleEmailChange = (e) => {
@@ -61,11 +82,11 @@ function SignupPage() {
   const handleUsernameChange = (e) => {
     const value = e.target.value;
     setUsername(value);
-  }
+  };
 
   return (
-    <div className="container-fluid">
-      <div
+    <Container fluid>
+      <Row
         className="row min-vh-100 d-flex justify-content-center align-items-center"
         style={{
           backgroundImage: `url(${backgroundImage})`,
@@ -74,7 +95,7 @@ function SignupPage() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div
+        <Col
           className="col-6 p-4 shadow-lg rounded"
           style={{
             width: "100%",
@@ -82,81 +103,79 @@ function SignupPage() {
             backgroundColor: "rgba(255, 255, 255, 0.95)",
           }}
         >
-          <form className="mx-3" onSubmit={handleSubmit}>
+          <Form className="mx-3" onSubmit={handleSubmit}>
             {alertMessage && (
-              <div
-                className={`alert alert-${alertType} alert-dismissible fade show mb-4`}
-                role="alert"
+              <Alert
+                variant={alertType}
+                dismissible
+                onClose={() => setAlertMessage("")}
+                className="mb-4"
               >
                 {alertMessage}
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setAlertMessage("")}
-                  aria-label="Close"
-                ></button>
-              </div>
+              </Alert>
             )}
             <p className="mb-2 text-muted fs-5 text-center">
               Create your account!
             </p>
             <h1 className="display-6 mb-4 fw-normal text-center">Sign Up</h1>
 
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <div className="input-group">
-                <input
+            <Form.Group className="mb-3" controlId="email">
+              <Form.Label>Email</Form.Label>
+              <InputGroup>
+                <Form.Control
                   type="email"
-                  className={`form-control ${
-                    email ? (isEmailValid ? "is-valid" : "is-invalid") : ""
-                  }`}
-                  id="email"
                   value={email}
                   onChange={handleEmailChange}
+                  placeholder="Enter email"
+                  isValid={!!email && isEmailValid}
+                  isInvalid={!!email && !isEmailValid}
                 />
-                <span className="input-group-text">
+                <InputGroup.Text>
                   <i className="bi bi-envelope"></i>
-                </span>
-              </div>
-            </div>
+                </InputGroup.Text>
+              </InputGroup>
+            </Form.Group>
 
-            <div className="mb-2">
-              <label className="form-label">Name</label>
-              <div className="input-group">
-                <input
-                  type="username"
-                  className={`form-control`}
-                  id="username"
+            <Form.Group className="mb-2" controlId="username">
+              <Form.Label>Name</Form.Label>
+              <InputGroup className="input-group">
+                <Form.Control
+                  type="text"
                   value={username}
                   onChange={handleUsernameChange}
+                  placeholder="Enter username"
                 />
-                <span className="input-group-text">
+                <InputGroup.Text>
                   <i className="bi bi-lock"></i>
-                </span>
-              </div>
-            </div>
+                </InputGroup.Text>
+              </InputGroup>
+            </Form.Group>
 
-            <div className="mb-4">
-              <label className="form-label">Password</label>
-              <div className="input-group">
-                <input
-                  type="password"
-                  className={`form-control ${
-                    password
-                      ? isPasswordValid
-                        ? "is-valid"
-                        : "is-invalid"
-                      : ""
-                  }`}
-                  id="password"
+            <Form.Group className="mb-4" controlId="password">
+              <Form.Label>Password</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={handlePasswordChange}
+                  isValid={!!password && isPasswordValid}
+                  isInvalid={!!password && !isPasswordValid}
+                  placeholder="Enter password"
                 />
-                <span className="input-group-text">
-                  <i className="bi bi-lock"></i>
-                </span>
-              </div>
-            </div>
+                <Button
+                  variant="outline-secondary"
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <i className="bi bi-eye"></i>
+                  ) : (
+                    <i className="bi bi-eye-slash"></i>
+                  )}
+                </Button>
+              </InputGroup>
+            </Form.Group>
             <button
               type="submit"
               onSubmit={handleSubmit}
@@ -164,10 +183,10 @@ function SignupPage() {
             >
               Sign Up
             </button>
-          </form>
-        </div>
-      </div>
-    </div>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
