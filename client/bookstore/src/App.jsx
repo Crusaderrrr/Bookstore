@@ -14,11 +14,11 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<AuthLayout />}></Route>
-            <Route index element={<LoginPage />} />
+          <Route path="/auth" element={<AuthLayout />}></Route>
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
           <Route path="/" element={<MainLayout />}>
-            <Route path="home" element={<HomePage/>}></Route>
+            <Route index element={<HomePage/>}></Route>
             <Route path="shop" element={<ShopPage />} />
             <Route path="cart" element={<CartPage/>} />
           </Route>

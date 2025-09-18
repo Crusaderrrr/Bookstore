@@ -1,34 +1,25 @@
-package com.bookstore.app.model;
+package com.bookstore.app.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.bookstore.app.validator.ValidPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
-@Entity
-@Table(name = "users")
 @Data
-public class User {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+public class UserDTO {
 
   @NotEmpty(message = "Username is required")
   private String username;
 
   @Email(message = "Please provide a valid email")
-  @Column(unique = true)
   private String email;
 
   @NotBlank(message = "Password is required")
+  @ValidPassword
   private String password;
 
   private String roles;
+
   private boolean active;
 }

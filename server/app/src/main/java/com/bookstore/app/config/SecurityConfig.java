@@ -1,6 +1,10 @@
 package com.bookstore.app.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import com.bookstore.app.filter.JwtFilter;
 import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,48 +18,42 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import jakarta.servlet.http.HttpServletResponse;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
+  @Autowired private JwtFilter jwtFilter;
+
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
-    http
-      .csrf().disable()
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
+    http.csrf(customizer -> customizer.disable())
         .cors(withDefaults())
         .authenticationProvider(authenticationProvider)
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/hello", "/users", "/users/login", "/users/register").permitAll()
-            .anyRequest().authenticated()
-        )
-        .formLogin(form -> form
-          .loginProcessingUrl("/login") 
-          .successHandler((request, response, authentication) -> {
-            response.setStatus(HttpServletResponse.SC_OK); 
-          })
-          .failureHandler((request, response, exception) -> {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); 
-          })
-          .permitAll())
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(
+                        "/hello", "/users", "/users/login", "/users/register", "/users/new")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .httpBasic(withDefaults())
+        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
         .logout(logout -> logout.permitAll());
     return http.build();
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+      throws Exception {
     return config.getAuthenticationManager();
   }
-
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -63,7 +61,8 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+  public AuthenticationProvider authenticationProvider(
+      UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
     provider.setUserDetailsService(userDetailsService);
     provider.setPasswordEncoder(passwordEncoder);

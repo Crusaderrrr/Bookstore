@@ -1,0 +1,36 @@
+package com.bookstore.app.service;
+
+import com.bookstore.app.dto.UserDTO;
+import com.bookstore.app.model.User;
+import com.bookstore.app.repo.UserRepo;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+@Service
+public class UserService {
+  private final UserRepo userRepo;
+  private final PasswordEncoder pswEncoder;
+
+  public UserService(UserRepo userRepo, PasswordEncoder pswEncoder) {
+    this.userRepo = userRepo;
+    this.pswEncoder = pswEncoder;
+  }
+
+  public User findByUsername(String username) {
+    return userRepo.findUserByUsername(username).get();
+  }
+
+  public User saveUser(UserDTO userDTO) {
+    User user = new User();
+    user.setUsername(userDTO.getUsername());
+    user.setEmail(userDTO.getEmail());
+    user.setRoles(userDTO.getRoles());
+    user.setActive(userDTO.isActive());
+    user.setPassword(pswEncoder.encode(userDTO.getPassword()));
+    return userRepo.save(user);
+  }
+
+  public Iterable<User> getAllUsers() {
+    return userRepo.findAll();
+  }
+}
