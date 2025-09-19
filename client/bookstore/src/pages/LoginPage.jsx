@@ -119,8 +119,6 @@ function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={handlePasswordChange}
-                  isValid={!!password && isPasswordValid}
-                  isInvalid={!!password && !isPasswordValid}
                   placeholder="Enter password"
                 />
                 <Button

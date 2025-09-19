@@ -12,7 +12,6 @@ export default function AppNavbar() {
   const { role } = useContext(AppContext);
   const isAdmin = role === "ADMIN";
 
-
   return (
     <Navbar bg={theme} variant={theme} expand="lg">
       <Container fluid>
@@ -26,9 +25,11 @@ export default function AppNavbar() {
             style={{ maxHeight: "100px" }}
             navbarScroll
           >
-            <Nav.Link as={Link} to="/profile">
-              My Profile <i className="bi bi-person"></i>
-            </Nav.Link>
+            {isLoggedIn && (
+              <Nav.Link as={Link} to="/profile">
+                My Profile <i className="bi bi-person"></i>
+              </Nav.Link>
+            )}
             <Nav.Link as={Link} to="/shop">
               Shop
             </Nav.Link>

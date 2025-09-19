@@ -9,6 +9,7 @@ import AuthLayout from "./components/AuthLayout";
 import SignupPage from "./pages/SignupPage";
 import CartPage from "./pages/CartPage";
 import UserProfilePage from "./pages/UserProfilePage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="shop" element={<ShopPage />} />
             <Route path="cart" element={<CartPage/>} />
             <Route path="profile" element={<UserProfilePage/>}/>
+            <Route path="/admin" element={<AdminPage/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
