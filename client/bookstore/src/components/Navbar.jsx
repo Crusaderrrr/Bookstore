@@ -5,10 +5,13 @@ import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
+import { AppContext } from "../context/AppContext";
 
 export default function AppNavbar() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme, isLoggedIn } = useContext(AppContext);
+  const { isAdmin } = useContext(AppContext);
+
+  console.log(isAdmin);
 
   return (
     <Navbar bg={theme} variant={theme} expand="lg">
@@ -23,15 +26,21 @@ export default function AppNavbar() {
             style={{ maxHeight: "100px" }}
             navbarScroll
           >
-            <Nav.Link as={Link} to="/">
-              Home
+            <Nav.Link as={Link} to="/profile">
+              My Profile <i className="bi bi-person"></i>
             </Nav.Link>
             <Nav.Link as={Link} to="/shop">
               Shop
             </Nav.Link>
-            <Nav.Link as={Link} to="/cart">
-              <i className="bi bi-cart" role="img" aria-label="Cart" />
-            </Nav.Link>
+            {isLoggedIn ? (
+              <Nav.Link as={Link} to="/cart">
+                <i className="bi bi-cart" role="img" aria-label="Cart" />
+              </Nav.Link>
+            ) : (
+              <Nav.Link as={Link} to="/login">
+                Login
+              </Nav.Link>
+            )}
             <Nav.Link onClick={toggleTheme} style={{ cursor: "pointer" }}>
               {theme === "dark" ? (
                 <i className="bi bi-moon-fill"></i>
@@ -40,6 +49,11 @@ export default function AppNavbar() {
               )}
             </Nav.Link>
           </Nav>
+          {isAdmin && (
+            <Nav.Link as={Link} to="/admin" className="me-2">
+              <i className="bi bi-gear"></i>
+            </Nav.Link>
+          )}
           <Form className="d-flex">
             <Form.Control
               type="search"

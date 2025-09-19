@@ -11,9 +11,12 @@ import {
   Alert,
   InputGroup,
 } from "react-bootstrap";
+import { AppContext } from "../context/AppContext";
+import { useContext } from "react";
 
 function SignupPage() {
   const navigate = useNavigate();
+  const { setIsLoggedIn } = useContext(AppContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,12 +39,13 @@ function SignupPage() {
           password,
           email,
           roles: "USER",
-          active: true
+          active: true,
         },
         {
           withCredentials: true,
         }
       );
+      setIsLoggedIn(true);
       localStorage.setItem("accessToken", response.data.accessToken);
       setAlertMessage("Signup successful!");
       setAlertType("success");

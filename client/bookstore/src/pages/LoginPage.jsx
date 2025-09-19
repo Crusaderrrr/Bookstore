@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import backgroundImage from "../assets/background_image.webp";
 import { Link } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -15,6 +16,7 @@ import {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const {setIsLoggedIn, setIsAdmin} = useContext(AppContext);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
@@ -32,11 +34,14 @@ function LoginPage() {
         withCredentials: true,
       });
       localStorage.setItem("accessToken", response.data.accessToken);
+      setIsAdmin(response.data.role === "ADMIN");
+      localStorage.setItem("userRole", response.data.role);
+      setIsLoggedIn(true);
       setAlertMessage("Login successful!");
       setAlertType("success");
       navigate("/");
     } catch (err) {
-      setAlertMessage(err.response.data.message);
+      setAlertMessage(err.response.data.error);
       setAlertType("danger");
     }
   };

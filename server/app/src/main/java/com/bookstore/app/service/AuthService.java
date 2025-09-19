@@ -1,14 +1,14 @@
 package com.bookstore.app.service;
 
+import com.bookstore.app.exception.InvalidCredentialsException;
 import com.bookstore.app.model.AuthResponse;
 import com.bookstore.app.model.RefreshToken;
 import com.bookstore.app.model.User;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AuthService {
@@ -24,16 +24,15 @@ public class AuthService {
   }
 
   public AuthResponse verify(User user) {
-    Authentication authentication =
-        authManager.authenticate(
-            new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-    if (authentication.isAuthenticated()) {
+    try {
+      Authentication authentication =
+          authManager.authenticate(
+              new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
       String accessToken = jwtService.generateToken(user.getUsername());
-
       RefreshToken refToken = refreshService.createRefreshToken(user.getUsername());
       return new AuthResponse(accessToken, refToken.getToken());
-    } else {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
+    } catch (BadCredentialsException ex) {
+      throw new InvalidCredentialsException("Invalid username or password");
     }
   }
 }

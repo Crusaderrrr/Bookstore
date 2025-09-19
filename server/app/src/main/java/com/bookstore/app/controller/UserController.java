@@ -9,6 +9,8 @@ import com.bookstore.app.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,8 +52,9 @@ public class UserController {
     refreshCookie.setMaxAge(refreshTokenDurationMs.intValue() / 1000);
     response.addCookie(refreshCookie);
 
-    Map<String, String> responseBody = Map.of("accessToken", authResponse.getAccessToken());
-
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("accessToken", authResponse.getAccessToken());
+    responseBody.put("role", userService.findByUsername(user.getUsername()).getRoles());
     return ResponseEntity.ok(responseBody);
   }
 
@@ -59,6 +62,12 @@ public class UserController {
   @PreAuthorize("isAuthenticated()")
   public Iterable<User> getAllUsers() {
     return userService.getAllUsers();
+  }
+
+  @GetMapping("/self")
+  @PreAuthorize("isAuthenticated()")
+  public User getCurrentUser(Principal principal) {
+    return userService.findByUsername(principal.getName());
   }
 
   @PostMapping("/new")

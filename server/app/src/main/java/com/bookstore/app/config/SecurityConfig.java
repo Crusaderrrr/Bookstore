@@ -45,7 +45,13 @@ public class SecurityConfig {
                     .authenticated())
         .httpBasic(withDefaults())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        .logout(logout -> logout.permitAll());
+        .logout(logout -> logout
+        .logoutUrl("/logout")
+        .logoutSuccessUrl("/login?logout")
+        .invalidateHttpSession(true)
+        .deleteCookies("JSESSIONID", "refreshToken")
+        .permitAll()
+        );
     return http.build();
   }
 
