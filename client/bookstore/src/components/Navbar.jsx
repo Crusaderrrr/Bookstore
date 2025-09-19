@@ -9,9 +9,9 @@ import { AppContext } from "../context/AppContext";
 
 export default function AppNavbar() {
   const { theme, toggleTheme, isLoggedIn } = useContext(AppContext);
-  const { isAdmin } = useContext(AppContext);
+  const { role } = useContext(AppContext);
+  const isAdmin = role === "ADMIN";
 
-  console.log(isAdmin);
 
   return (
     <Navbar bg={theme} variant={theme} expand="lg">

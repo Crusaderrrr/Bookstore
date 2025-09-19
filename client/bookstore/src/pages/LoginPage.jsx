@@ -16,7 +16,7 @@ import {
 
 function LoginPage() {
   const navigate = useNavigate();
-  const {setIsLoggedIn, setIsAdmin} = useContext(AppContext);
+  const {setIsLoggedIn, setRole} = useContext(AppContext);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
@@ -34,7 +34,7 @@ function LoginPage() {
         withCredentials: true,
       });
       localStorage.setItem("accessToken", response.data.accessToken);
-      setIsAdmin(response.data.role === "ADMIN");
+      setRole(response.data.role);
       localStorage.setItem("userRole", response.data.role);
       setIsLoggedIn(true);
       setAlertMessage("Login successful!");
@@ -86,7 +86,6 @@ function LoginPage() {
             {alertMessage && (
               <Alert
                 variant={alertType}
-                dismissible
                 onClose={() => setAlertMessage("")}
                 className="mb-4"
               >

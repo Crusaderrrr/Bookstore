@@ -47,6 +47,7 @@ function SignupPage() {
       );
       setIsLoggedIn(true);
       localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("userRole", "USER");
       setAlertMessage("Signup successful!");
       setAlertType("success");
       navigate("/");
@@ -111,7 +112,6 @@ function SignupPage() {
             {alertMessage && (
               <Alert
                 variant={alertType}
-                dismissible
                 onClose={() => setAlertMessage("")}
                 className="mb-4"
               >

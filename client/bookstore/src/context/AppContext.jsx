@@ -10,7 +10,7 @@ export const AppContext = createContext({
 export const ContextProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("accessToken"));
-  const [isAdmin, setIsAdmin] = useState(localStorage.getItem("userRole") === "ADMIN" ? true : false);
+  const [role, setRole] = useState(localStorage.getItem("userRole"));
 
   useEffect(() => {
     document.documentElement.setAttribute("data-bs-theme", theme);
@@ -20,7 +20,7 @@ export const ContextProvider = ({ children }) => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
-  const value = useMemo(() => ({ theme, toggleTheme, isLoggedIn, setIsLoggedIn, isAdmin, setIsAdmin }), [theme, isLoggedIn, isAdmin]);
+  const value = useMemo(() => ({ theme, toggleTheme, isLoggedIn, setIsLoggedIn, role, setRole }), [theme, isLoggedIn, role]);
 
   return (
     <AppContext.Provider value={value}>{children}</AppContext.Provider>
