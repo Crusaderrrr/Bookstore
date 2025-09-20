@@ -1,5 +1,6 @@
 package com.bookstore.app.service;
 
+import com.bookstore.app.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -19,16 +20,21 @@ public class JWTService {
   @Value("${JWT_SECRET_KEY}")
   private String secretKey;
 
-  public String generateToken(String username) {
+  public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
+    claims.put("roles", user.getRoles());
 
     return Jwts.builder()
         .setClaims(claims)
-        .setSubject(username)
+        .setSubject(user.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
         .signWith(getKey())
         .compact();
+  }
+
+  public String extractRoles(String token) {
+    return extractAllClaims(token).get("roles", String.class);
   }
 
   public Key getKey() {

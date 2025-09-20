@@ -15,12 +15,17 @@ public class AuthService {
   private final AuthenticationManager authManager;
   private final JWTService jwtService;
   private final RefreshService refreshService;
+  private final UserService userService;
 
   public AuthService(
-      AuthenticationManager authManager, JWTService jwtService, RefreshService refreshService) {
+      AuthenticationManager authManager,
+      JWTService jwtService,
+      RefreshService refreshService,
+      UserService userService) {
     this.authManager = authManager;
     this.jwtService = jwtService;
     this.refreshService = refreshService;
+    this.userService = userService;
   }
 
   public AuthResponse verify(User user) {
@@ -28,7 +33,9 @@ public class AuthService {
       Authentication authentication =
           authManager.authenticate(
               new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-      String accessToken = jwtService.generateToken(user.getUsername());
+
+      User authUser = userService.findByUsername(user.getUsername());
+      String accessToken = jwtService.generateToken(authUser);
       RefreshToken refToken = refreshService.createRefreshToken(user.getUsername());
       return new AuthResponse(accessToken, refToken.getToken());
     } catch (BadCredentialsException ex) {

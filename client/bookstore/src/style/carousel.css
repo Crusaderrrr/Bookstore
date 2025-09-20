@@ -1,0 +1,15 @@
+.carousel img {
+  width: 100%;         /* Image width adapts to container */
+  height: auto;        /* Maintains aspect ratio */
+  max-width: 800px;    /* Sets maximum width */
+  min-width: 300px;    /* Sets minimum width */
+  object-fit: cover;   /* Optional: crop to fill container nicely */
+  display: block;      /* Removes extra bottom spacing */
+  margin: 0 auto;      /* Centers image horizontally */
+}
+.carousel {
+  max-width: 800px;    /* Carousel max width */
+  min-width: 300px;    /* Carousel min width */
+  width: 100%;         /* Carousel width responsive */
+  overflow: hidden;    /* Hide overflow */
+}

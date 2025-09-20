@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -80,10 +81,16 @@ public class UserController {
               .collect(Collectors.toList());
       return ResponseEntity.badRequest().body(errors);
     }
+    try {
+      User savedUser = userService.saveUser(user);
 
-    Map<String, String> responseBody =
-        Map.of("accessToken", jwtService.generateToken(user.getUsername()));
-    userService.saveUser(user);
-    return ResponseEntity.ok(responseBody);
+      String accessToken = jwtService.generateToken(savedUser);
+
+      Map<String, String> responseBody =
+          Map.of("accessToken", accessToken);
+      return ResponseEntity.ok(responseBody);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
   }
 }

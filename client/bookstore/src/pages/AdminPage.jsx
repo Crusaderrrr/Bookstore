@@ -57,13 +57,13 @@ export default function AdminPage() {
             aria-label="Toolbar with Button groups"
           >
             <ButtonGroup aria-label="First group">
-              <Button variant="primary">Block</Button>
-              <Button variant="primary">Unblock</Button>
+              <Button variant="primary" title="Block user"><i className="bi bi-lock"></i></Button>
+              <Button variant="primary"  title="Unblock user"><i className="bi bi-unlock"></i></Button>
             </ButtonGroup>
             <ButtonGroup>
-              <Button variant="success">+ admin</Button>
-              <Button variant="danger">- admin</Button>
-              <Button variant="secondary">Delete</Button>
+              <Button variant="success" title="Add admin rights"><i className="bi bi-person-plus-fill"></i></Button>
+              <Button variant="danger" title="Remove admin rights"><i className="bi bi-person-x-fill"></i></Button>
+              <Button variant="secondary" title="Delete user"><i className="bi bi-trash3"></i></Button>
             </ButtonGroup>
           </ButtonToolbar>
           <Table striped bordered hover>
