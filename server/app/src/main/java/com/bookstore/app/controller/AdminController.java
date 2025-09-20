@@ -24,4 +24,29 @@ public class AdminController {
     userService.deleteUsersById(userIds);
     return ResponseEntity.ok("User deleted");
   }
+
+  @PostMapping("/make_admin")
+  public ResponseEntity<String> makeAdmin(@RequestBody List<Integer> userIds) {
+    userService.makeAdmin(userIds);
+    return ResponseEntity.ok("User made admin");
+  }
+
+  @PostMapping("/remove_admin")
+  public ResponseEntity<String> removeAdmin(@RequestBody List<Integer> userIds) {
+    userService.removeAdmin(userIds);
+    return ResponseEntity.ok("Admin rights removed");
+  }
+
+  @PostMapping("/block")
+  public ResponseEntity<String> blockUsers(@RequestBody List<Integer> userIds) {
+      userService.blockUsers(userIds);
+      return ResponseEntity.ok("User blocked");
+  }
+
+  @PostMapping("/unblock")
+  public ResponseEntity<String> unblockUsers(@RequestBody List<Integer> userIds) {
+      userService.unblockUsers(userIds);
+      return ResponseEntity.ok("User unblocked");
+  }
+  
 }
