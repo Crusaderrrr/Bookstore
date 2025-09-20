@@ -66,7 +66,7 @@ public class UserController {
   }
 
   @GetMapping("/self")
-  @PreAuthorize("isAuthenticated()")
+  @PreAuthorize("hasRole('ADMIN')")
   public User getCurrentUser(Principal principal) {
     return userService.findByUsername(principal.getName());
   }

@@ -2,6 +2,7 @@ package com.bookstore.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.bookstore.app.exception.CustomAccessDeniedHandler;
 import com.bookstore.app.filter.JwtFilter;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ public class SecurityConfig {
     http.csrf(customizer -> customizer.disable())
         .cors(withDefaults())
         .authenticationProvider(authenticationProvider)
+        .exceptionHandling(
+            exception -> exception.accessDeniedHandler(new CustomAccessDeniedHandler()))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
@@ -45,13 +48,14 @@ public class SecurityConfig {
                     .authenticated())
         .httpBasic(withDefaults())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        .logout(logout -> logout
-        .logoutUrl("/logout")
-        .logoutSuccessUrl("/login?logout")
-        .invalidateHttpSession(true)
-        .deleteCookies("JSESSIONID", "refreshToken")
-        .permitAll()
-        );
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/login?logout")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID", "refreshToken")
+                    .permitAll());
     return http.build();
   }
 
