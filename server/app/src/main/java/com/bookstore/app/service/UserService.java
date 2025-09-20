@@ -4,6 +4,7 @@ import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.exception.UserAlreadyExistsException;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.UserRepo;
+import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,15 @@ public class UserService {
     this.userRepo = userRepo;
     this.pswEncoder = pswEncoder;
   }
+
+  public void deleteUsersById(List<Integer> userIds) {
+    userIds.forEach(this::deleteUserById);
+  }
+
+  public void deleteUserById(Integer userId) {
+    userRepo.deleteById(userId);
+  }
+
 
   public User findByUsername(String username) {
     return userRepo.findUserByUsername(username).get();

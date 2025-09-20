@@ -34,8 +34,9 @@ function LoginPage() {
         withCredentials: true,
       });
       localStorage.setItem("accessToken", response.data.accessToken);
-      setRole(response.data.role);
-      localStorage.setItem("userRole", response.data.role);
+      setRole(response.data.role.slice(5));
+      console.log(response.data.role.slice(5))
+      localStorage.setItem("userRole", response.data.role.slice(5));
       setIsLoggedIn(true);
       setAlertMessage("Login successful!");
       setAlertType("success");
