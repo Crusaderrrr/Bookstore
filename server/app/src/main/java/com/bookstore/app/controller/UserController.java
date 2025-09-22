@@ -66,7 +66,7 @@ public class UserController {
   }
 
   @GetMapping("/self")
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("isAuthenticated()")
   public User getCurrentUser(Principal principal) {
     return userService.findByUsername(principal.getName());
   }
@@ -86,8 +86,7 @@ public class UserController {
 
       String accessToken = jwtService.generateToken(savedUser);
 
-      Map<String, String> responseBody =
-          Map.of("accessToken", accessToken);
+      Map<String, String> responseBody = Map.of("accessToken", accessToken);
       return ResponseEntity.ok(responseBody);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());

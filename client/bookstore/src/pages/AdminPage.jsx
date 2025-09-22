@@ -9,6 +9,7 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
+import axiosInstance from "../config/axiosConfig";
 import axios from "axios";
 
 export default function AdminPage() {
@@ -18,12 +19,8 @@ export default function AdminPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/users/all", {
-          withCredentials: true,
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-        });
+        const response = await axiosInstance.get("/users/all");
+        console.log(response.data);
         setUsers(response.data);
       } catch (err) {
         console.log(err);
@@ -54,12 +51,72 @@ export default function AdminPage() {
     }
 
     try {
-      const response = await axios.post("http://localhost:8080/users/delete", selectedUsers, {
-        withCredentials: true,
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-        },
-      });
+      const response = await axiosInstance.post("/users/delete", selectedUsers);
+      setSelectedUsers([]);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleBlockUsers = async () => {
+    if (selectedUsers.length === 0) {
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post("/users/block", selectedUsers);
+      setSelectedUsers([]);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUnblockUsers = async () => {
+    if (selectedUsers.length === 0) {
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        "/users/unblock",
+        selectedUsers
+      );
+      setSelectedUsers([]);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleGiveAdminRights = async () => {
+    if (selectedUsers.length === 0) {
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        "/users/make_admin",
+        selectedUsers
+      );
+      setSelectedUsers([]);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRemoveAdminRights = async () => {
+    if (selectedUsers.length === 0) {
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        "/users/remove_admin",
+        selectedUsers
+      );
       setSelectedUsers([]);
       window.location.reload();
     } catch (err) {
@@ -76,18 +133,34 @@ export default function AdminPage() {
             aria-label="Toolbar with Button groups"
           >
             <ButtonGroup aria-label="First group">
-              <Button variant="primary" title="Block user">
+              <Button
+                variant="primary"
+                title="Block user"
+                onClick={handleBlockUsers}
+              >
                 <i className="bi bi-lock"></i>
               </Button>
-              <Button variant="primary" title="Unblock user">
+              <Button
+                variant="primary"
+                title="Unblock user"
+                onClick={handleUnblockUsers}
+              >
                 <i className="bi bi-unlock"></i>
               </Button>
             </ButtonGroup>
             <ButtonGroup>
-              <Button variant="success" title="Add admin rights">
+              <Button
+                variant="success"
+                title="Add admin rights"
+                onClick={handleGiveAdminRights}
+              >
                 <i className="bi bi-person-plus-fill"></i>
               </Button>
-              <Button variant="danger" title="Remove admin rights">
+              <Button
+                variant="danger"
+                title="Remove admin rights"
+                onClick={handleRemoveAdminRights}
+              >
                 <i className="bi bi-person-x-fill"></i>
               </Button>
               <Button
@@ -113,6 +186,7 @@ export default function AdminPage() {
                 <th>Username</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Active</th>
               </tr>
             </thead>
             <tbody>
@@ -130,6 +204,7 @@ export default function AdminPage() {
                   <td>{user.username}</td>
                   <td>{user.email}</td>
                   <td>{user.roles}</td>
+                  <td>{user.active ? "Yes" : "No"}</td>
                 </tr>
               ))}
             </tbody>

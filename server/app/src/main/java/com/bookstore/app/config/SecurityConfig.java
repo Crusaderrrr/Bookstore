@@ -3,6 +3,7 @@ package com.bookstore.app.config;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import com.bookstore.app.exception.CustomAccessDeniedHandler;
+import com.bookstore.app.exception.CustomAuthenticationEntryPoint;
 import com.bookstore.app.filter.JwtFilter;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class SecurityConfig {
 
   @Autowired private JwtFilter jwtFilter;
 
+  @Autowired private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
   @Bean
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
@@ -38,7 +41,10 @@ public class SecurityConfig {
         .cors(withDefaults())
         .authenticationProvider(authenticationProvider)
         .exceptionHandling(
-            exception -> exception.accessDeniedHandler(new CustomAccessDeniedHandler()))
+            exception ->
+                exception
+                    .accessDeniedHandler(new CustomAccessDeniedHandler())
+                    .authenticationEntryPoint(customAuthenticationEntryPoint))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
