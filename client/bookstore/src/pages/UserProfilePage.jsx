@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import ProfileInfo from "../components/profile/ProfileInfo";
 import axios from "axios";
+import axiosInstance from "../config/axiosConfig";
 
 export default function UserProfilePage() {
   const [user, setUser] = useState(null);
@@ -9,12 +10,7 @@ export default function UserProfilePage() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const response = await axios.get("http://localhost:8080/users/self", {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
+        const response = await axiosInstance.get("/users/self");
         setUser(response.data);
       } catch (err) {
         console.error(err);
@@ -25,12 +21,7 @@ export default function UserProfilePage() {
 
   const handleLogout = async () => {
     try {
-      axios.post(
-        "http://localhost:8080/logout",
-        {
-          withCredentials: true,
-        }
-      );
+      axiosInstance.post("/logout");
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userRole");
       window.location.href = "/";

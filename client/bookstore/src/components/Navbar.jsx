@@ -38,7 +38,7 @@ export default function AppNavbar() {
                 <i className="bi bi-cart" role="img" aria-label="Cart" />
               </Nav.Link>
             ) : (
-              <Nav.Link as={Link} to="/login">
+              <Nav.Link as={Link} to="/login" onClick={theme === "dark" ? toggleTheme : null}>
                 Login
               </Nav.Link>
             )}
