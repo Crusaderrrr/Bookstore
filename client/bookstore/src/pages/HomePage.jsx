@@ -1,26 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import axios from "axios";
 import { Carousel, Col, Container, Row } from "react-bootstrap";
-// import '../style/carousel.css';
+
 
 export default function HomePage() {
   const [users, setUsers] = useState([]);
-
-  async function handleSendRequest() {
-    try {
-      const response = await axios.get("http://localhost:8080/users/all", {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
-      setUsers(response.data);
-      console.log("Users:", response.data);
-    } catch (err) {
-      console.error("Failed to fetch users:", err);
-    }
-  }
 
     return (
     <Container fluid>

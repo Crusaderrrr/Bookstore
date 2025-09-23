@@ -11,12 +11,13 @@ import {
   Form,
   Button,
   Alert,
-  InputGroup
+  InputGroup,
 } from "react-bootstrap";
+import axiosInstance from "../config/axiosConfig";
 
 function LoginPage() {
   const navigate = useNavigate();
-  const {setIsLoggedIn, setRole} = useContext(AppContext);
+  const { setIsLoggedIn, setRole } = useContext(AppContext);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
@@ -30,12 +31,13 @@ function LoginPage() {
     setAlertType("");
 
     try {
-      const response = await axios.post("http://localhost:8080/users/login", {username, password}, {
-        withCredentials: true,
+      const response = await axiosInstance.post("/users/login", {
+        username,
+        password,
       });
       localStorage.setItem("accessToken", response.data.accessToken);
       setRole(response.data.role.slice(5));
-      console.log(response.data.role.slice(5))
+      console.log(response.data.role.slice(5));
       localStorage.setItem("userRole", response.data.role.slice(5));
       setIsLoggedIn(true);
       setAlertMessage("Login successful!");
@@ -62,7 +64,7 @@ function LoginPage() {
     setIsPasswordValid(validatePassword(value));
   };
 
- return (
+  return (
     <Container fluid>
       <Row
         className="min-vh-100 d-flex justify-content-center align-items-center"
@@ -125,10 +127,14 @@ function LoginPage() {
                 <Button
                   variant="outline-secondary"
                   type="button"
-                  onClick={() => setShowPassword(prev => !prev)}
+                  onClick={() => setShowPassword((prev) => !prev)}
                   tabIndex={-1}
                 >
-                  {showPassword ? <i className="bi bi-eye"></i> : <i className="bi bi-eye-slash"></i>}
+                  {showPassword ? (
+                    <i className="bi bi-eye"></i>
+                  ) : (
+                    <i className="bi bi-eye-slash"></i>
+                  )}
                 </Button>
               </InputGroup>
             </Form.Group>

@@ -13,6 +13,7 @@ import {
 } from "react-bootstrap";
 import { AppContext } from "../context/AppContext";
 import { useContext } from "react";
+import axiosInstance from "../config/axiosConfig";
 
 function SignupPage() {
   const navigate = useNavigate();
@@ -32,19 +33,13 @@ function SignupPage() {
     setAlertType("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/users/new",
-        {
-          username,
-          password,
-          email,
-          roles: "USER",
-          active: true,
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axiosInstance.post("/users/new", {
+        username,
+        password,
+        email,
+        roles: "USER",
+        active: true,
+      });
       setIsLoggedIn(true);
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("userRole", "USER");

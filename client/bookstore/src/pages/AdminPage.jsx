@@ -10,11 +10,11 @@ import {
   Table,
 } from "react-bootstrap";
 import axiosInstance from "../config/axiosConfig";
-import axios from "axios";
 
 export default function AdminPage() {
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
+  const sortedUsers = users.sort((a, b) => {a.username.localeCompare(b.username)})
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -190,7 +190,7 @@ export default function AdminPage() {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, i) => (
+              {sortedUsers.map((user, i) => (
                 <tr key={user.id}>
                   <td>
                     <Form.Check
