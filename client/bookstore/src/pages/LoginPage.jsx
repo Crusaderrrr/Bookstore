@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import axios from "axios";
 import backgroundImage from "../assets/background_image.webp";
 import { Link } from "react-router-dom";
 import { AppContext } from "../context/AppContext";

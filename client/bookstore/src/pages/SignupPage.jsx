@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import backgroundImage from "../assets/background_image.webp";
 import { useNavigate } from "react-router-dom";
 import {
