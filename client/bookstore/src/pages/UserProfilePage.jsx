@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import ProfileInfo from "../components/profile/ProfileInfo";
-import axios from "axios";
 import axiosInstance from "../config/axiosConfig";
 
 export default function UserProfilePage() {
