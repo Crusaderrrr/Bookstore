@@ -26,8 +26,7 @@ public class CloudinaryController {
   }
 
   @PostMapping("/delete")
-  public Map deleteFile(@RequestBody String publicId) throws IOException {
-    return cloudinaryService.deleteFile(
-        "r2ojkovifd321ssu8paa"); // Hardcoded for development purposes
+  public Map deleteFile(@RequestParam("publicId") String publicId) throws IOException {
+    return cloudinaryService.deleteFile(publicId);
   }
 }
