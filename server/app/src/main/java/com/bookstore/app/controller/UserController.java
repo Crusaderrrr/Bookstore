@@ -2,13 +2,17 @@ package com.bookstore.app.controller;
 
 import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.AuthResponse;
+import com.bookstore.app.model.Image;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.AuthService;
+import com.bookstore.app.service.CloudinaryService;
+import com.bookstore.app.service.ImageService;
 import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +28,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/users")
@@ -32,14 +38,20 @@ public class UserController {
   private final UserService userService;
   private final AuthService authService;
   private final JWTService jwtService;
+  private final ImageService imageService;
 
   @Value("${app.jwtRefreshExpirationMs}")
   private Long refreshTokenDurationMs;
 
-  public UserController(UserService userService, AuthService authService, JWTService jwtService) {
+  public UserController(
+      UserService userService,
+      AuthService authService,
+      JWTService jwtService,
+      ImageService imageService) {
     this.userService = userService;
     this.authService = authService;
     this.jwtService = jwtService;
+    this.imageService = imageService;
   }
 
   @PostMapping("/login")
@@ -91,5 +103,12 @@ public class UserController {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
+  }
+
+  @PostMapping("/image_upload")
+  public ResponseEntity<String> uploadUserImage(
+      @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
+        imageService.modifyImage(principal.getName(), file);
+    return ResponseEntity.ok("Image uploaded");
   }
 }

@@ -37,6 +37,7 @@ export default function UserProfilePage() {
             username={user?.username}
             email={user?.email}
             onLogout={handleLogout}
+            image={user?.image}
           />
         </Col>
       </Row>

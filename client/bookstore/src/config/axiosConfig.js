@@ -2,10 +2,9 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: "http://localhost:8080",
-  withCredentials: true,  // Automatically send cookies on all requests
+  withCredentials: true, 
 });
 
-// Request interceptor to attach access token header unless skipAuth is set
 axiosInstance.interceptors.request.use(
   async (config) => {
     if (!config.skipAuth) {
@@ -14,12 +13,11 @@ axiosInstance.interceptors.request.use(
         config.headers["Authorization"] = "Bearer " + accessToken;
       }
     }
-    return config; // always return config
+    return config; 
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle 401 errors and refresh tokens
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
