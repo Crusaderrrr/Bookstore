@@ -1,7 +1,10 @@
 package com.bookstore.app.controller;
 
+import com.bookstore.app.model.Author;
 import com.bookstore.app.model.Book;
+import com.bookstore.app.service.AuthorService;
 import com.bookstore.app.service.BookService;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/books")
 public class BookController {
   private final BookService bookService;
+  private final AuthorService authorService;
 
-  public BookController(BookService bookService) {
+
+  public BookController(BookService bookService, AuthorService authorService) {
     this.bookService = bookService;
+    this.authorService = authorService;
   }
 
   @GetMapping("/all")
@@ -25,8 +31,9 @@ public class BookController {
   }
 
   @PostMapping("/new")
-  public ResponseEntity<String> newBook(@RequestBody Book book, Principal principal) {
-    bookService.saveBook(book, principal.getName());
+  public ResponseEntity<String> newBook(@Valid @RequestBody Book book, Principal principal) {
+    Author author = authorService.getAuthorByUsername(principal.getName());
+    bookService.saveBook(book, author);
     return ResponseEntity.ok("Book created");
   }
 }

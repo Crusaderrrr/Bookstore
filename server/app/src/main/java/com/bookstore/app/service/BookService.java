@@ -1,24 +1,17 @@
 package com.bookstore.app.service;
 
+import com.bookstore.app.model.Author;
 import com.bookstore.app.model.Book;
-import com.bookstore.app.model.User;
 import com.bookstore.app.repo.BookRepo;
+import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BookService {
   private final BookRepo bookRepo;
-  private final UserService userService;
 
-  public BookService(BookRepo bookRepo, UserService userService) {
+  public BookService(BookRepo bookRepo) {
     this.bookRepo = bookRepo;
-    this.userService = userService;
-  }
-
-  public Book saveBook(Book book, String username) {
-    User author = userService.findByUsername(username);
-    book.setAuthor(author);
-    return bookRepo.save(book);
   }
 
   public Book getBookById(Long id) {
@@ -27,5 +20,11 @@ public class BookService {
 
   public Iterable<Book> getAllBooks() {
     return bookRepo.findAll();
+  }
+
+  public void saveBook(Book book, Author author) {
+    book.setAuthor(author);
+    book.setDatePosted(LocalDate.now());
+    bookRepo.save(book);
   }
 }
