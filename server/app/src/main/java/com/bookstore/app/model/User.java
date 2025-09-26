@@ -1,5 +1,6 @@
 package com.bookstore.app.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,5 +35,6 @@ public class User {
   private boolean active;
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+  @JsonManagedReference
   private Image image;
 }
