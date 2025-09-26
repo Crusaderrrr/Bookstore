@@ -29,6 +29,27 @@ export default function UserProfilePage() {
     }
   };
 
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axiosInstance.post("/users/image_upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      window.location.reload();
+      setUser(updatedUser.data);
+    } catch (err) {
+      console.error("Image upload failed", err);
+      alert("Failed to upload image.");
+    }
+  };
+
   return (
     <Container fluid>
       <Row className="justify-content-center mt-4">
@@ -37,7 +58,8 @@ export default function UserProfilePage() {
             username={user?.username}
             email={user?.email}
             onLogout={handleLogout}
-            image={user?.image.url}
+            image={user?.image?.url}
+            onImageChange={handleImageChange}
           />
         </Col>
       </Row>
