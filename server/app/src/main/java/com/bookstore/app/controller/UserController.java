@@ -4,13 +4,22 @@ import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.AuthResponse;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.AuthService;
+import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,17 +31,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
   private final UserService userService;
   private final AuthService authService;
+  private final JWTService jwtService;
 
   @Value("${app.jwtRefreshExpirationMs}")
   private Long refreshTokenDurationMs;
 
-  public UserController(UserService userService, AuthService authService) {
+  public UserController(UserService userService, AuthService authService, JWTService jwtService) {
     this.userService = userService;
     this.authService = authService;
+    this.jwtService = jwtService;
   }
 
   @PostMapping("/login")
-  public String login(@RequestBody User user, HttpServletResponse response) {
+  public ResponseEntity<Map<String, String>> login(
+      @RequestBody User user, HttpServletResponse response) {
     AuthResponse authResponse = authService.verify(user);
     Cookie refreshCookie = new Cookie("refreshToken", authResponse.getRefreshToken());
     refreshCookie.setHttpOnly(true);
@@ -40,7 +52,11 @@ public class UserController {
     refreshCookie.setPath("/");
     refreshCookie.setMaxAge(refreshTokenDurationMs.intValue() / 1000);
     response.addCookie(refreshCookie);
-    return authResponse.getAccessToken();
+
+    Map<String, String> responseBody = new HashMap<>();
+    responseBody.put("accessToken", authResponse.getAccessToken());
+    responseBody.put("role", userService.findByUsername(user.getUsername()).getRoles());
+    return ResponseEntity.ok(responseBody);
   }
 
   @GetMapping("/all")
@@ -49,9 +65,31 @@ public class UserController {
     return userService.getAllUsers();
   }
 
+  @GetMapping("/self")
+  @PreAuthorize("isAuthenticated()")
+  public User getCurrentUser(Principal principal) {
+    return userService.findByUsername(principal.getName());
+  }
+
   @PostMapping("/new")
-  public ResponseEntity<String> newUser(@Valid @RequestBody UserDTO user) {
-    userService.saveUser(user);
-    return ResponseEntity.ok("User created");
+  public ResponseEntity<?> newUser(
+      @Valid @RequestBody UserDTO user, BindingResult result, HttpServletResponse response) {
+    if (result.hasErrors()) {
+      List<String> errors =
+          result.getAllErrors().stream()
+              .map(ObjectError::getDefaultMessage)
+              .collect(Collectors.toList());
+      return ResponseEntity.badRequest().body(errors);
+    }
+    try {
+      User savedUser = userService.saveUser(user);
+
+      String accessToken = jwtService.generateToken(savedUser);
+
+      Map<String, String> responseBody = Map.of("accessToken", accessToken);
+      return ResponseEntity.ok(responseBody);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
   }
 }

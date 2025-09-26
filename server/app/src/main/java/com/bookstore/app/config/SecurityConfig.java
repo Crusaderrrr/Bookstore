@@ -2,6 +2,8 @@ package com.bookstore.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import com.bookstore.app.exception.CustomAccessDeniedHandler;
+import com.bookstore.app.exception.CustomAuthenticationEntryPoint;
 import com.bookstore.app.filter.JwtFilter;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,22 +32,41 @@ public class SecurityConfig {
 
   @Autowired private JwtFilter jwtFilter;
 
+  @Autowired private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
   @Bean
   public SecurityFilterChain securityFilterChain(
       HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
     http.csrf(customizer -> customizer.disable())
         .cors(withDefaults())
         .authenticationProvider(authenticationProvider)
+        .exceptionHandling(
+            exception ->
+                exception
+                    .accessDeniedHandler(new CustomAccessDeniedHandler())
+                    .authenticationEntryPoint(customAuthenticationEntryPoint))
         .authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                        "/hello", "/users", "/users/login", "/users/register", "/users/new")
+                        "/hello",
+                        "/users",
+                        "/users/login",
+                        "/users/register",
+                        "/users/new",
+                        "/refresh_token")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
         .httpBasic(withDefaults())
         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-        .logout(logout -> logout.permitAll());
+        .logout(
+            logout ->
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/login?logout")
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID", "refreshToken")
+                    .permitAll());
     return http.build();
   }
 

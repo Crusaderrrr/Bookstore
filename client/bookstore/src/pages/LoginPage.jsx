@@ -1,35 +1,49 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useContext, useState } from "react";
 import backgroundImage from "../assets/background_image.webp";
 import { Link } from "react-router-dom";
+import { AppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Alert,
+  InputGroup,
+} from "react-bootstrap";
+import axiosInstance from "../config/axiosConfig";
 
-function Login() {
+function LoginPage() {
   const navigate = useNavigate();
+  const { setIsLoggedIn, setRole } = useContext(AppContext);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
-  const [error, setError] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
-  const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    const params = new URLSearchParams();
-    params.append("username", username);
-    params.append("password", password);
+    setAlertMessage("");
+    setAlertType("");
 
     try {
-      const response = await axios.post("http://localhost:8080/login", params, {
-        withCredentials: true,
+      const response = await axiosInstance.post("/users/login", {
+        username,
+        password,
       });
+      localStorage.setItem("accessToken", response.data.accessToken);
+      setRole(response.data.role.slice(5));
+      console.log(response.data.role.slice(5));
+      localStorage.setItem("userRole", response.data.role.slice(5));
+      setIsLoggedIn(true);
       setAlertMessage("Login successful!");
       setAlertType("success");
-      navigate("/home");
+      navigate("/");
     } catch (err) {
-      setError("Invalid username or password. Please try again.");
+      setAlertMessage(err.response.data.error);
       setAlertType("danger");
     }
   };
@@ -50,9 +64,9 @@ function Login() {
   };
 
   return (
-    <div className="container-fluid">
-      <div
-        className="row min-vh-100 d-flex justify-content-center align-items-center"
+    <Container fluid>
+      <Row
+        className="min-vh-100 d-flex justify-content-center align-items-center"
         style={{
           backgroundImage: `url(${backgroundImage})`,
           backgroundSize: "cover",
@@ -60,86 +74,76 @@ function Login() {
           backgroundRepeat: "no-repeat",
         }}
       >
-        <div
-          className="col-6 p-4 shadow-lg rounded"
+        <Col
+          xs={12}
+          md={8}
+          lg={6}
+          className="p-4 shadow-lg rounded"
           style={{
-            width: "100%",
             maxWidth: "650px",
             backgroundColor: "rgba(255, 255, 255, 0.95)",
           }}
         >
-          <form className="mx-3" onSubmit={handleSubmit}>
+          <Form className="mx-3" onSubmit={handleSubmit}>
             {alertMessage && (
-              <div
-                className={`alert alert-${alertType} alert-dismissible fade show mb-4`}
-                role="alert"
+              <Alert
+                variant={alertType}
+                onClose={() => setAlertMessage("")}
+                className="mb-4"
               >
                 {alertMessage}
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setAlertMessage("")}
-                  aria-label="Close"
-                ></button>
-              </div>
+              </Alert>
             )}
             <p className="mb-2 text-muted fs-5 text-center">
               Start your journey!
             </p>
             <h1 className="display-6 mb-4 fw-normal text-center">Login</h1>
 
-            <div className="mb-3">
-              <label className="form-label">Username</label>
-              <div className="input-group">
-                <input
-                  type="username"
-                  className={`form-control`}
-                  id="username"
+            <Form.Group className="mb-3" controlId="username">
+              <Form.Label>Username</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type="text"
                   value={username}
                   onChange={handleUsernameChange}
+                  placeholder="Enter username"
                 />
-                <span className="input-group-text">
+                <InputGroup.Text>
                   <i className="bi bi-envelope"></i>
-                </span>
-              </div>
-            </div>
+                </InputGroup.Text>
+              </InputGroup>
+            </Form.Group>
 
-            <div className="mb-2">
-              <label className="form-label">Password</label>
-              <div className="input-group">
-                <input
-                  type="password"
-                  className={`form-control ${
-                    password
-                      ? isPasswordValid
-                        ? "is-valid"
-                        : "is-invalid"
-                      : ""
-                  }`}
-                  id="password"
+            <Form.Group className="mb-2" controlId="password">
+              <Form.Label>Password</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={handlePasswordChange}
+                  placeholder="Enter password"
                 />
-                <span className="input-group-text">
-                  <i className="bi bi-lock"></i>
-                </span>
-              </div>
-            </div>
-
-            <div className="input-group mb-4 d-flex justify-content-between">
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="remember_me"
-                />
-                <label
-                  className="form-check-label text-secondary"
-                  htmlFor="remember_me"
+                <Button
+                  variant="outline-secondary"
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  tabIndex={-1}
                 >
-                  Remember me
-                </label>
-              </div>
+                  {showPassword ? (
+                    <i className="bi bi-eye"></i>
+                  ) : (
+                    <i className="bi bi-eye-slash"></i>
+                  )}
+                </Button>
+              </InputGroup>
+            </Form.Group>
+
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <Form.Check
+                type="checkbox"
+                id="remember_me"
+                label={<span className="text-secondary">Remember me</span>}
+              />
               <div className="forgot">
                 <small>
                   <a href="#">Forgot Password?</a>
@@ -147,13 +151,9 @@ function Login() {
               </div>
             </div>
 
-            <button
-              type="submit"
-              onSubmit={handleSubmit}
-              className="btn btn-primary w-100"
-            >
+            <Button type="submit" className="w-100" variant="primary">
               Log In
-            </button>
+            </Button>
 
             <div className="text-center mt-3">
               <small className="text-muted">
@@ -163,11 +163,11 @@ function Login() {
                 </Link>
               </small>
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
-export default Login;
+export default LoginPage;

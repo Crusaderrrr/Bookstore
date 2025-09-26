@@ -20,7 +20,6 @@ export default function ShopPage() {
             <Card className="h-100">
               <Card.Img
                 variant="top"
-                // src={`https://via.placeholder.com/150/888/FFF?text=Book+${item.id}`}
                 alt="Book Image"
               />
               <Card.Body className="d-flex flex-column">
