@@ -36,7 +36,7 @@ function SignupPage() {
         username,
         password,
         email,
-        roles: "USER",
+        roles: "ROLE_USER",
         active: true,
       });
       setIsLoggedIn(true);
