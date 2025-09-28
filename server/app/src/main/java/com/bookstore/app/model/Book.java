@@ -1,5 +1,6 @@
 package com.bookstore.app.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +33,7 @@ public class Book {
   private LocalDate datePosted;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "author_id") 
+  @JoinColumn(name = "author_id")
+  @JsonBackReference
   private Author author;
 }

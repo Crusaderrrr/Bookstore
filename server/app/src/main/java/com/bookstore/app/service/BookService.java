@@ -4,6 +4,7 @@ import com.bookstore.app.model.Author;
 import com.bookstore.app.model.Book;
 import com.bookstore.app.repo.BookRepo;
 import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,8 +15,8 @@ public class BookService {
     this.bookRepo = bookRepo;
   }
 
-  public Book getBookById(Long id) {
-    return bookRepo.findById(id).orElse(null);
+  public Optional<Book> getBookById(Long id) {
+    return bookRepo.findById(id);
   }
 
   public Iterable<Book> getAllBooks() {
