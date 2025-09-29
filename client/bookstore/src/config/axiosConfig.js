@@ -32,7 +32,6 @@ axiosInstance.interceptors.response.use(
           {},
           { withCredentials: true }
         );
-        console.log(response.data);
         const newAccessToken = response.data.accessToken;
 
         localStorage.setItem("accessToken", newAccessToken);

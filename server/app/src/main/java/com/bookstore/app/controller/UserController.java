@@ -2,12 +2,11 @@ package com.bookstore.app.controller;
 
 import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.AuthResponse;
-import com.bookstore.app.model.Image;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.AuthService;
-import com.bookstore.app.service.CloudinaryService;
 import com.bookstore.app.service.ImageService;
 import com.bookstore.app.service.JWTService;
+import com.bookstore.app.service.RefreshService;
 import com.bookstore.app.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +38,7 @@ public class UserController {
   private final AuthService authService;
   private final JWTService jwtService;
   private final ImageService imageService;
+  private final RefreshService refreshService;
 
   @Value("${app.jwtRefreshExpirationMs}")
   private Long refreshTokenDurationMs;
@@ -47,11 +47,13 @@ public class UserController {
       UserService userService,
       AuthService authService,
       JWTService jwtService,
-      ImageService imageService) {
+      ImageService imageService,
+      RefreshService refreshService) {
     this.userService = userService;
     this.authService = authService;
     this.jwtService = jwtService;
     this.imageService = imageService;
+    this.refreshService = refreshService;
   }
 
   @PostMapping("/login")
@@ -95,6 +97,14 @@ public class UserController {
     }
     try {
       User savedUser = userService.saveUser(user);
+      Cookie refreshCookie =
+          new Cookie(
+              "refreshToken", refreshService.createRefreshToken(user.getUsername()).getToken());
+      refreshCookie.setHttpOnly(true);
+      refreshCookie.setSecure(true);
+      refreshCookie.setPath("/");
+      refreshCookie.setMaxAge(refreshTokenDurationMs.intValue() / 1000);
+      response.addCookie(refreshCookie);
 
       String accessToken = jwtService.generateToken(savedUser);
 
@@ -108,7 +118,7 @@ public class UserController {
   @PostMapping("/image_upload")
   public ResponseEntity<String> uploadUserImage(
       @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
-        imageService.modifyImage(principal.getName(), file);
+    imageService.modifyImage(principal.getName(), file);
     return ResponseEntity.ok("Image uploaded");
   }
 }

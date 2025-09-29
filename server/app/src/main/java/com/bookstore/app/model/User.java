@@ -21,8 +21,8 @@ import lombok.ToString;
 @Table(name = "users")
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = "image")
-@ToString(exclude = "image")
+@EqualsAndHashCode(exclude = {"image", "cart"})
+@ToString(exclude = {"image", "cart"})
 public class User {
 
   @Id
@@ -48,5 +48,6 @@ public class User {
   private Image image;
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+  @JsonManagedReference
   private Cart cart;
 }

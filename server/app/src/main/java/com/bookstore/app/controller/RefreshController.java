@@ -1,5 +1,6 @@
 package com.bookstore.app.controller;
 
+import com.bookstore.app.model.RefreshToken;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.RefreshService;
@@ -8,7 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,6 +32,7 @@ public class RefreshController {
       for (Cookie cookie : cookies) {
         if ("refreshToken".equals(cookie.getName())) {
           refreshToken = cookie.getValue();
+          System.out.println(refreshToken);
           break;
         }
       }
@@ -39,7 +43,9 @@ public class RefreshController {
     }
 
     try {
-      refreshService.verifyExpiration(refreshService.getRefreshToken(refreshToken));
+      RefreshToken token = refreshService.getRefreshToken(refreshToken);
+      System.out.println(token);
+      refreshService.verifyExpiration(token);
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     }
@@ -52,5 +58,25 @@ public class RefreshController {
     response.put("refreshToken", refreshToken);
 
     return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/token")
+  public ResponseEntity<String> getToken(HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    String refreshToken = null;
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if ("refreshToken".equals(cookie.getName())) {
+          refreshToken = cookie.getValue();
+          System.out.println(refreshToken);
+          break;
+        }
+      }
+    }
+
+    RefreshToken token = refreshService.getRefreshToken(refreshToken);
+    System.out.println(token);
+    
+    return ResponseEntity.ok(token.getToken());
   }
 }
