@@ -59,24 +59,4 @@ public class RefreshController {
 
     return ResponseEntity.ok(response);
   }
-
-  @GetMapping("/token")
-  public ResponseEntity<String> getToken(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    String refreshToken = null;
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if ("refreshToken".equals(cookie.getName())) {
-          refreshToken = cookie.getValue();
-          System.out.println(refreshToken);
-          break;
-        }
-      }
-    }
-
-    RefreshToken token = refreshService.getRefreshToken(refreshToken);
-    System.out.println(token);
-    
-    return ResponseEntity.ok(token.getToken());
-  }
 }

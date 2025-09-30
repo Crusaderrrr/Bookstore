@@ -55,7 +55,7 @@ public class SecurityConfig {
                         "/users/register",
                         "/users/new",
                         "/refresh_token",
-                        "/token")
+                        "/books/all")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

@@ -3,19 +3,18 @@ import { Container, Table, Button, Form, ButtonToolbar } from "react-bootstrap";
 import axiosInstance from "../config/axiosConfig";
 
 export default function CartPage() {
-
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const response = await axiosInstance.get("/cart/items")
+        const response = await axiosInstance.get("/cart/items");
         setCartItems(response.data);
       } catch (err) {
         console.error("Error fetching cart items:", err);
       }
-    }
+    };
     fetchCartItems();
   }, []);
 
@@ -35,11 +34,16 @@ export default function CartPage() {
     }
   };
 
-  const handleDeleteSelected = () => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => !selectedItems.includes(item.id))
-    );
-    setSelectedItems([]);
+  const handleRemoveFromCart = async () => {
+    try {
+      const response = await axiosInstance.post("/cart/remove", selectedItems);
+      if (response.status === 200) {
+        setCartItems(prev => prev.filter(item => !selectedItems.includes(item.book.id)));
+        setSelectedItems([]);
+      }
+    } catch (err) {
+      console.error("Error removing from cart:", err);
+    }
   };
 
   const isAllSelected =
@@ -52,7 +56,7 @@ export default function CartPage() {
       <ButtonToolbar className="mb-3">
         <Button
           variant="danger"
-          onClick={handleDeleteSelected}
+          onClick={handleRemoveFromCart}
           disabled={selectedItems.length === 0}
         >
           Delete Selected

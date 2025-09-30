@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,5 +39,12 @@ public class CartController {
     List<CartItem> items = cartService.getCartByUsername(principal.getName()).getItems();
 
     return ResponseEntity.ok(items);
+  }
+
+  @PostMapping("/remove")
+  public ResponseEntity<String> removeBooksFromCart(@RequestBody List<Long> bookIds) {
+    cartService.removeFromCart(bookIds);
+
+    return ResponseEntity.ok("Books removed from cart");
   }
 }

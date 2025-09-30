@@ -6,6 +6,7 @@ import com.bookstore.app.model.CartItem;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.CartItemRepo;
 import com.bookstore.app.repo.CartRepo;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -63,5 +64,9 @@ public class CartService {
     }
 
     return cartRepo.save(cart);
+  }
+
+  public void removeFromCart(List<Long> bookIds) {
+    cartItemRepo.deleteByBookIdIn(bookIds);
   }
 }
