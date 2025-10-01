@@ -51,7 +51,7 @@ public class Author {
 
   private String image;
 
-  @NotBlank(message = "Pseudonim is required")
+  @NotBlank(message = "Pseudonym is required")
   @Column(unique = true)
-  private String pseudonim;
+  private String pseudonym;
 }

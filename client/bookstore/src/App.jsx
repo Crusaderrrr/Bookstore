@@ -11,6 +11,7 @@ import CartPage from "./pages/CartPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import AdminPage from "./pages/AdminPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
+import EmailConfirmationForm from "./pages/EmailConfirmationForm";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route element={<AuthLayout />}></Route>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/email-confirmation" element={<EmailConfirmationForm/>}/>
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage/>}></Route>
             <Route path="shop" element={<ShopPage />} />

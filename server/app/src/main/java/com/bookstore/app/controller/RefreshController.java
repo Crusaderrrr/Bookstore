@@ -32,7 +32,6 @@ public class RefreshController {
       for (Cookie cookie : cookies) {
         if ("refreshToken".equals(cookie.getName())) {
           refreshToken = cookie.getValue();
-          System.out.println(refreshToken);
           break;
         }
       }
@@ -44,7 +43,6 @@ public class RefreshController {
 
     try {
       RefreshToken token = refreshService.getRefreshToken(refreshToken);
-      System.out.println(token);
       refreshService.verifyExpiration(token);
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(e.getMessage());

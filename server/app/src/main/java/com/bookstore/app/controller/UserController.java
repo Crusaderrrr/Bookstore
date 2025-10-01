@@ -8,6 +8,7 @@ import com.bookstore.app.service.ImageService;
 import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.RefreshService;
 import com.bookstore.app.service.UserService;
+import com.bookstore.app.service.VerificationService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -39,6 +40,7 @@ public class UserController {
   private final JWTService jwtService;
   private final ImageService imageService;
   private final RefreshService refreshService;
+  private final VerificationService verificationService;
 
   @Value("${app.jwtRefreshExpirationMs}")
   private Long refreshTokenDurationMs;
@@ -48,12 +50,14 @@ public class UserController {
       AuthService authService,
       JWTService jwtService,
       ImageService imageService,
-      RefreshService refreshService) {
+      RefreshService refreshService,
+      VerificationService verificationService) {
     this.userService = userService;
     this.authService = authService;
     this.jwtService = jwtService;
     this.imageService = imageService;
     this.refreshService = refreshService;
+    this.verificationService = verificationService;
   }
 
   @PostMapping("/login")
@@ -120,5 +124,15 @@ public class UserController {
       @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
     imageService.modifyImage(principal.getName(), file);
     return ResponseEntity.ok("Image uploaded");
+  }
+
+  @PostMapping("/confirm-email")
+  public ResponseEntity<String> confirmEmail(@RequestBody String code, Principal principal) {
+    String email = userService.findByUsername(principal.getName()).getEmail();
+    if (!verificationService.verifyCode(email, code)) {
+      return ResponseEntity.badRequest().body("Invalid verification code");
+    }
+
+    return ResponseEntity.ok("Email confirmed");
   }
 }
