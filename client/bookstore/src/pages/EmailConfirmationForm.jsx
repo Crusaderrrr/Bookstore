@@ -8,28 +8,29 @@ export default function EmailConfirmationModal() {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setErrorMessage("");
     setSuccess(false);
+    const formData = new FormData();
+    formData.append("code", code);
     try {
-      const response = axiosInstance.post("/users/confirm-email", code);
+      const response = await axiosInstance.post(
+        "/users/confirm-email",
+        formData
+      );
+      console.log(response.status);
       if (response.status === 200) {
         setSuccess(true);
-        // navigate("/");
-      } else {
-        setError("Invalid confirmation code");
+        navigate("/");
       }
-
     } catch (err) {
       console.error(err);
-      setError("Invalid confirmation code");
+      setErrorMessage("Invalid confirmation code");
       setSuccess(false);
-    } finally {
-      setSuccess(false);
-      setError("");
     }
   };
 
@@ -52,6 +53,11 @@ export default function EmailConfirmationModal() {
             backgroundColor: "rgba(255, 255, 255, 0.95)",
           }}
         >
+          {errorMessage && (
+            <Alert variant="danger" className="mb-3" dismissible>
+              Invalid confirmation code
+            </Alert>
+          )}
           <Form onSubmit={handleSubmit} noValidate>
             <Form.Group controlId="confirmationCode" className="mb-3">
               <Form.Label>Enter Confirmation Code</Form.Label>
@@ -62,9 +68,6 @@ export default function EmailConfirmationModal() {
                 onChange={(e) => setCode(e.target.value)}
                 isInvalid={!!error}
               />
-              <Form.Control.Feedback type="invalid">
-                {error}
-              </Form.Control.Feedback>
             </Form.Group>
             <Button type="submit" disabled={success} className="w-100">
               Confirm

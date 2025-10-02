@@ -131,12 +131,14 @@ public class UserController {
   }
 
   @PostMapping("/confirm-email")
-  public ResponseEntity<String> confirmEmail(@RequestBody String code, Principal principal) {
+  public ResponseEntity<String> confirmEmail(
+      @RequestParam String code, Principal principal) {
     String email = userService.findByUsername(principal.getName()).getEmail();
     if (!verificationService.verifyCode(email, code)) {
       return ResponseEntity.badRequest().body("Invalid verification code");
     }
-
+    userService.findByUsername(principal.getName()).setActive(true);
+    userService.saveUser(userService.findByUsername(principal.getName()));
     return ResponseEntity.ok("Email confirmed");
   }
 }
