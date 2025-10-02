@@ -5,6 +5,7 @@ import com.bookstore.app.model.User;
 import com.bookstore.app.repo.ImageRepo;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -45,17 +46,34 @@ public class ImageService {
     Optional<Image> existingImageOpt = imageRepo.findImageByUserId(user.getId());
     if (existingImageOpt.isPresent()) {
       Image image = existingImageOpt.get();
-      cloudinaryService.deleteFile(image.getPublicId()); 
-      Map imageData = cloudinaryService.uploadFile(file); 
+      cloudinaryService.deleteFile(image.getPublicId());
+      Map imageData = cloudinaryService.uploadFile(file);
       String newPublicId = imageData.get("public_id").toString();
       String newUrl = imageData.get("secure_url").toString();
 
       image.setPublicId(newPublicId);
       image.setUrl(newUrl);
 
-      imageRepo.save(image); 
+      imageRepo.save(image);
     } else {
-      addImage(username, file); 
+      addImage(username, file);
     }
+  }
+
+  @Transactional
+  public void deleteImagesByUserIds(List<Integer> userIds) throws IOException {
+    userIds.forEach(
+        userId -> {
+          try {
+            deleteImageByUserId(userId);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
+  public void deleteImageByUserId(int userId) throws IOException {
+    Image image = findImageByUserId(userId);
+    cloudinaryService.deleteFile(image.getPublicId());
   }
 }

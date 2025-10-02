@@ -1,5 +1,6 @@
 package com.bookstore.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,4 +51,16 @@ public class User {
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
   @JsonManagedReference
   private Cart cart;
+
+  @OneToOne(
+      mappedBy = "user",
+      cascade = CascadeType.PERSIST,
+      fetch = FetchType.LAZY,
+      optional = true)
+  @JsonIgnore
+  private Author author;
+
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+  @JsonIgnore
+  private RefreshToken refreshToken;
 }

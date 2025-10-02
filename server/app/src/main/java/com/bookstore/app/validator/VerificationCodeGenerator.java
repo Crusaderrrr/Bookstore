@@ -1,7 +1,9 @@
 package com.bookstore.app.validator;
 
 import java.security.SecureRandom;
+import org.springframework.stereotype.Component;
 
+@Component
 public class VerificationCodeGenerator {
   private static final String CHARACTERS =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

@@ -4,6 +4,7 @@ import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.AuthResponse;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.AuthService;
+import com.bookstore.app.service.EmailService;
 import com.bookstore.app.service.ImageService;
 import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.RefreshService;
@@ -41,6 +42,7 @@ public class UserController {
   private final ImageService imageService;
   private final RefreshService refreshService;
   private final VerificationService verificationService;
+  private final EmailService emailService;
 
   @Value("${app.jwtRefreshExpirationMs}")
   private Long refreshTokenDurationMs;
@@ -51,13 +53,15 @@ public class UserController {
       JWTService jwtService,
       ImageService imageService,
       RefreshService refreshService,
-      VerificationService verificationService) {
+      VerificationService verificationService,
+      EmailService emailService) {
     this.userService = userService;
     this.authService = authService;
     this.jwtService = jwtService;
     this.imageService = imageService;
     this.refreshService = refreshService;
     this.verificationService = verificationService;
+    this.emailService = emailService;
   }
 
   @PostMapping("/login")

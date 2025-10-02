@@ -1,6 +1,8 @@
 package com.bookstore.app.controller;
 
+import com.bookstore.app.service.ImageService;
 import com.bookstore.app.service.UserService;
+import java.io.IOException;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,13 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
   private final UserService userService;
+  private final ImageService imageService;
 
-  public AdminController(UserService userService) {
+  public AdminController(UserService userService, ImageService imageService) {
     this.userService = userService;
+    this.imageService = imageService;
   }
 
   @PostMapping("/delete")
-  public ResponseEntity<String> deleteUser(@RequestBody List<Integer> userIds) {
+  public ResponseEntity<String> deleteUser(@RequestBody List<Integer> userIds) throws IOException {
+    imageService.deleteImagesByUserIds(userIds);
     userService.deleteUsersById(userIds);
     return ResponseEntity.ok("User deleted");
   }
@@ -39,14 +44,13 @@ public class AdminController {
 
   @PostMapping("/block")
   public ResponseEntity<String> blockUsers(@RequestBody List<Integer> userIds) {
-      userService.blockUsers(userIds);
-      return ResponseEntity.ok("User blocked");
+    userService.blockUsers(userIds);
+    return ResponseEntity.ok("User blocked");
   }
 
   @PostMapping("/unblock")
   public ResponseEntity<String> unblockUsers(@RequestBody List<Integer> userIds) {
-      userService.unblockUsers(userIds);
-      return ResponseEntity.ok("User unblocked");
+    userService.unblockUsers(userIds);
+    return ResponseEntity.ok("User unblocked");
   }
-  
 }

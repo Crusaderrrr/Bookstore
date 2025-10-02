@@ -10,6 +10,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Data
@@ -21,6 +23,7 @@ public class RefreshToken {
 
   @OneToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private User user;
 
   @Column(nullable = false, unique = true)

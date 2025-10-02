@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
@@ -35,11 +36,11 @@ public class Author {
   @NotBlank(message = "Surname is required")
   private String surname;
 
-  @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "author", cascade = CascadeType.PERSIST, orphanRemoval = true)
   @JsonManagedReference
   private List<Book> books = new ArrayList<>();
 
-  @ManyToOne(optional = true)
+  @OneToOne(optional = true)
   @JoinColumn(name = "user_id", nullable = true)
   private User user;
 
