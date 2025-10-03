@@ -36,8 +36,13 @@ public class ImageService {
     imageRepo.save(image);
   }
 
-  public Image findImageByUserId(int id) {
-    return imageRepo.findImageByUserId(id).get();
+  public Image findImageByUserId(Integer userId) {
+    Optional<Image> imageOpt = imageRepo.findImageByUserId(userId);
+    if (imageOpt.isPresent()) {
+      return imageOpt.get();
+    } else {
+      return null;
+    }
   }
 
   @Transactional

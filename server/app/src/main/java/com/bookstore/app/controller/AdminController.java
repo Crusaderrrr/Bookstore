@@ -1,5 +1,6 @@
 package com.bookstore.app.controller;
 
+import com.bookstore.app.model.Image;
 import com.bookstore.app.service.ImageService;
 import com.bookstore.app.service.UserService;
 import java.io.IOException;
@@ -25,7 +26,12 @@ public class AdminController {
 
   @PostMapping("/delete")
   public ResponseEntity<String> deleteUser(@RequestBody List<Integer> userIds) throws IOException {
-    imageService.deleteImagesByUserIds(userIds);
+    for (Integer userId : userIds) {
+      Image image = imageService.findImageByUserId(userId);
+      if (image != null) {
+        imageService.deleteImageByUserId(userId);
+      }
+    }
     userService.deleteUsersById(userIds);
     return ResponseEntity.ok("User deleted");
   }

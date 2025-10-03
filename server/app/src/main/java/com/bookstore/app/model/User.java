@@ -59,8 +59,4 @@ public class User {
       optional = true)
   @JsonIgnore
   private Author author;
-
-  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-  @JsonIgnore
-  private RefreshToken refreshToken;
 }

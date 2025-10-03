@@ -52,8 +52,8 @@ export default function AdminPage() {
 
     try {
       const response = await axiosInstance.post("/users/delete", selectedUsers);
+      setUsers(users.filter(user => !selectedUsers.includes(user.id)));
       setSelectedUsers([]);
-      window.location.reload();
     } catch (err) {
       console.error(err);
     }
