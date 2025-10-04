@@ -24,7 +24,7 @@ public class ImageService {
     this.userService = userService;
   }
 
-  public void addImage(String username, MultipartFile file) throws IOException {
+  public Image addImage(String username, MultipartFile file) throws IOException {
     User user = userService.findByUsername(username);
     Map imageData = cloudinaryService.uploadFile(file);
     String publicId = imageData.get("public_id").toString();
@@ -33,7 +33,7 @@ public class ImageService {
     image.setPublicId(publicId);
     image.setUrl(imageUrl);
     image.setUser(user);
-    imageRepo.save(image);
+    return imageRepo.save(image);
   }
 
   public Image findImageByUserId(Integer userId) {
@@ -46,7 +46,7 @@ public class ImageService {
   }
 
   @Transactional
-  public void modifyImage(String username, MultipartFile file) throws IOException {
+  public Image modifyImage(String username, MultipartFile file) throws IOException {
     User user = userService.findByUsername(username);
     Optional<Image> existingImageOpt = imageRepo.findImageByUserId(user.getId());
     if (existingImageOpt.isPresent()) {
@@ -59,9 +59,9 @@ public class ImageService {
       image.setPublicId(newPublicId);
       image.setUrl(newUrl);
 
-      imageRepo.save(image);
+      return imageRepo.save(image);
     } else {
-      addImage(username, file);
+      return addImage(username, file);
     }
   }
 

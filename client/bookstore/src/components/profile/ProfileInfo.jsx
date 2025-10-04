@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { Alert, Button, ButtonGroup, Card, Col, Container, Form, Row } from "react-bootstrap";
+import {
+  Alert,
+  Badge,
+  Button,
+  ButtonGroup,
+  Card,
+  Col,
+  Container,
+  Form,
+  InputGroup,
+  Row,
+} from "react-bootstrap";
 import default_profile_image from "../../assets/default_profile_image.jpg";
 import "../../style/authorForm.css";
 import axiosInstance from "../../config/axiosConfig";
@@ -14,10 +25,11 @@ export default function ProfileInfo({
   const [becomeAuthor, setBecomeAuthor] = useState(false);
   const [name, setName] = React.useState("");
   const [surname, setSurname] = React.useState("");
-  const [genres, setGenres] = React.useState(["Comedy", "Drama"]);
+  const [genres, setGenres] = React.useState([]);
   const [bio, setBio] = React.useState("");
   const [pseudonym, setPseudonym] = React.useState("");
   const [alert, setAlert] = useState(false);
+  const [currentGenre, setCurrentGenre] = useState("");
 
   const handleSubmitAuthor = async (event) => {
     event.preventDefault();
@@ -45,6 +57,23 @@ export default function ProfileInfo({
   const handleBecomeAuthor = () => {
     setBecomeAuthor(!becomeAuthor);
   };
+
+  const handleChange = (e) => {
+    setCurrentGenre(e.target.value);
+  };
+
+  const handleAddGenre = (e) => {
+    e.preventDefault();
+    if (currentGenre.trim() === "") return;
+    setGenres([...genres, currentGenre.trim()]);
+    setCurrentGenre("");
+  };
+
+  const handleRemoveGenre = (e, index) => {
+    e.preventDefault();
+    setGenres(genres.filter((_, i) => i !== index))
+  };
+
 
   return (
     <Container>
@@ -85,10 +114,29 @@ export default function ProfileInfo({
                       onChange={(e) => setSurname(e.target.value)}
                     />
                   </Form.Group>
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Genres</Form.Label>
-                    <Form.Control type="text" />
-                  </Form.Group>
+                  <InputGroup className="mb-1">
+                    <Form.Control
+                      placeholder="Enter genre"
+                      aria-label="Book genre"
+                      value={currentGenre}
+                      onChange={handleChange}
+                    />
+                    <Button variant="primary" onClick={handleAddGenre}>
+                      Add
+                    </Button>
+                  </InputGroup>
+                  <div className="mb-3 d-flex flex-wrap">
+                    {genres.map((genre, index) => (
+                      <Badge
+                        key={index}
+                        className="me-1"
+                        onClick={(e) => handleRemoveGenre(e, index)}
+                        style={{cursor: "pointer"}}
+                      >
+                        {genre}
+                      </Badge>
+                    ))}
+                  </div>
                   <Form.Group className="mb-3" controlId="formBasicPassword">
                     <Form.Label>Enter your Bio</Form.Label>
                     <Form.Control

@@ -2,6 +2,7 @@ package com.bookstore.app.controller;
 
 import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.AuthResponse;
+import com.bookstore.app.model.Image;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.AuthService;
 import com.bookstore.app.service.EmailService;
@@ -124,10 +125,10 @@ public class UserController {
   }
 
   @PostMapping("/image_upload")
-  public ResponseEntity<String> uploadUserImage(
+  public ResponseEntity<Image> uploadUserImage(
       @RequestParam("file") MultipartFile file, Principal principal) throws IOException {
-    imageService.modifyImage(principal.getName(), file);
-    return ResponseEntity.ok("Image uploaded");
+    Image image = imageService.modifyImage(principal.getName(), file);
+    return ResponseEntity.ok(image);
   }
 
   @PostMapping("/confirm-email")

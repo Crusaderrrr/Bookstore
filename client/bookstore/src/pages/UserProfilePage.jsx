@@ -42,11 +42,9 @@ export default function UserProfilePage() {
           "Content-Type": "multipart/form-data"
         }
       });
-      window.location.reload();
-      setUser(updatedUser.data);
+      setUser({ ...user, image: response.data });
     } catch (err) {
       console.error("Image upload failed", err);
-      alert("Failed to upload image.");
     }
   };
 
