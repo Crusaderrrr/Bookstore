@@ -2,15 +2,20 @@ import React, { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import ProfileInfo from "../components/profile/ProfileInfo";
 import axiosInstance from "../config/axiosConfig";
+import MyBooks from "../components/profile/MyBooks";
 
 export default function UserProfilePage() {
   const [user, setUser] = useState(null);
+  const [isAuthor, setIsAuthor] = useState(false);
+  const [books, setBooks] = useState([]);
 
   useEffect(() => {
     async function fetchUser() {
       try {
         const response = await axiosInstance.get("/users/self");
-        setUser(response.data);
+        setUser(response.data.user);
+        setBooks(response.data.books);
+        setIsAuthor(response.data.user.roles === "ROLE_AUTHOR");
       } catch (err) {
         console.error(err);
       }
@@ -51,14 +56,16 @@ export default function UserProfilePage() {
   return (
     <Container fluid>
       <Row className="justify-content-center mt-4">
-        <Col xs={6}>
+        <Col xs={8} md={6}>
           <ProfileInfo
             username={user?.username}
             email={user?.email}
             onLogout={handleLogout}
             image={user?.image?.url}
             onImageChange={handleImageChange}
+            isAuthor={isAuthor}
           />
+          {isAuthor && <MyBooks books={books}/>}
         </Col>
       </Row>
     </Container>

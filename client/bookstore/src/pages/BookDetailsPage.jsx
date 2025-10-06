@@ -10,7 +10,7 @@ import {
   InputGroup,
   Row,
 } from "react-bootstrap";
-import book_cover from "../assets/book_cover.jpg";
+import "../style/bookStyle.css";
 
 export default function BookDetailsPage() {
   const { id } = useParams();
@@ -18,6 +18,7 @@ export default function BookDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
   const [buttonText, setButtonText] = useState("Add to Cart");
+  const default_book_cover = "https://res.cloudinary.com/dupcshdti/image/upload/v1759743713/book_cover_rllhzg.jpg";
   const min = 1;
   const max = 30;
 
@@ -79,7 +80,7 @@ export default function BookDetailsPage() {
     <Container>
       <Row className="align-items-center">
         <Col className="text-center mt-5">
-          <img src={book_cover} alt="" style={{ maxHeight: "500px" }} />
+          <img src={book.bookImage?.url || default_book_cover} alt="" className="book-cover" />
           <div className="d-flex mt-2 mb-3">
             <Button className="mx-auto text-danger" variant="link" onClick={handleToggleLike}>
               {isLiked ? <i className="bi bi-heart-fill" style={{ fontSize: "1.5rem" }}></i> : <i className="bi bi-heart" style={{ fontSize: "1.5rem" }}></i>}

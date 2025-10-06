@@ -50,7 +50,7 @@ public class UserService {
   }
 
   public User saveUser(UserDTO userDTO) {
-    if (userRepo.findUserByUsername(userDTO.getUsername()).isPresent()) {
+    if (userRepo.existsByUsername(userDTO.getUsername())) {
       throw new UserAlreadyExistsException(
           "User with name " + userDTO.getUsername() + " already exists");
     }

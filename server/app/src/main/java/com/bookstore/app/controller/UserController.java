@@ -2,10 +2,13 @@ package com.bookstore.app.controller;
 
 import com.bookstore.app.dto.UserDTO;
 import com.bookstore.app.model.AuthResponse;
+import com.bookstore.app.model.Author;
+import com.bookstore.app.model.Book;
 import com.bookstore.app.model.Image;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.AuthService;
-import com.bookstore.app.service.EmailService;
+import com.bookstore.app.service.AuthorService;
+import com.bookstore.app.service.BookService;
 import com.bookstore.app.service.ImageService;
 import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.RefreshService;
@@ -16,9 +19,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -43,7 +48,8 @@ public class UserController {
   private final ImageService imageService;
   private final RefreshService refreshService;
   private final VerificationService verificationService;
-  private final EmailService emailService;
+  private final AuthorService authorService;
+  private final BookService bookService;
 
   @Value("${app.jwtRefreshExpirationMs}")
   private Long refreshTokenDurationMs;
@@ -55,14 +61,16 @@ public class UserController {
       ImageService imageService,
       RefreshService refreshService,
       VerificationService verificationService,
-      EmailService emailService) {
+      AuthorService authorService,
+      BookService bookService) {
     this.userService = userService;
     this.authService = authService;
     this.jwtService = jwtService;
     this.imageService = imageService;
     this.refreshService = refreshService;
     this.verificationService = verificationService;
-    this.emailService = emailService;
+    this.authorService = authorService;
+    this.bookService = bookService;
   }
 
   @PostMapping("/login")
@@ -90,8 +98,18 @@ public class UserController {
 
   @GetMapping("/self")
   @PreAuthorize("isAuthenticated()")
-  public User getCurrentUser(Principal principal) {
-    return userService.findByUsername(principal.getName());
+  public ResponseEntity<Map<String, Object>> getCurrentUser(Principal principal) {
+    User user = userService.findByUsername(principal.getName());
+    Map<String, Object> response = new HashMap<>();
+    response.put("user", user);
+    Optional<Author> authorOpt = authorService.getAuthorOptByUsername(principal.getName());
+    if (authorOpt.isPresent()) {
+      List<Book> books = bookService.getBooksByAuthor(authorOpt.get());
+      response.put("books", books);
+    } else {
+      response.put("books", Collections.emptyList());
+    }
+    return ResponseEntity.ok(response);
   }
 
   @PostMapping("/new")
@@ -132,8 +150,7 @@ public class UserController {
   }
 
   @PostMapping("/confirm-email")
-  public ResponseEntity<String> confirmEmail(
-      @RequestParam String code, Principal principal) {
+  public ResponseEntity<String> confirmEmail(@RequestParam String code, Principal principal) {
     String email = userService.findByUsername(principal.getName()).getEmail();
     if (!verificationService.verifyCode(email, code)) {
       return ResponseEntity.badRequest().body("Invalid verification code");

@@ -6,6 +6,7 @@ import com.bookstore.app.model.CartItem;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.CartItemRepo;
 import com.bookstore.app.repo.CartRepo;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -33,9 +34,7 @@ public class CartService {
   }
 
   public Cart createCartForUser(String username) {
-    User user =
-        userService
-            .findByUsername(username);
+    User user = userService.findByUsername(username);
 
     Cart cart = new Cart();
     cart.setUser(user);
@@ -45,7 +44,8 @@ public class CartService {
   public Cart addToCart(String username, Long bookId, int quantity) {
     Cart cart = getCartByUsername(username);
     Book book =
-        bookService.getBookById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
+        bookService
+            .getBookById(bookId);
 
     Optional<CartItem> existingItem =
         cart.getItems().stream().filter(item -> item.getBook().getId().equals(bookId)).findFirst();

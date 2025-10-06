@@ -28,8 +28,7 @@ public class LikeService {
   public void addLikeForBook(Long bookId, String username) {
     Book book =
         bookService
-            .getBookById(bookId)
-            .orElseThrow(() -> new EntityNotFoundException("Book not found"));
+            .getBookById(bookId);
     User user = userService.findByUsername(username);
     Like like = new Like();
     like.setBook(book);

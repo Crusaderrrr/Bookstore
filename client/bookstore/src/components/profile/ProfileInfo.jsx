@@ -21,6 +21,7 @@ export default function ProfileInfo({
   onLogout,
   image,
   onImageChange,
+  isAuthor,
 }) {
   const [becomeAuthor, setBecomeAuthor] = useState(false);
   const [name, setName] = React.useState("");
@@ -28,7 +29,8 @@ export default function ProfileInfo({
   const [genres, setGenres] = React.useState([]);
   const [bio, setBio] = React.useState("");
   const [pseudonym, setPseudonym] = React.useState("");
-  const [alert, setAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
   const [currentGenre, setCurrentGenre] = useState("");
 
   const handleSubmitAuthor = async (event) => {
@@ -47,9 +49,12 @@ export default function ProfileInfo({
     try {
       const response = await axiosInstance.post("/authors/new", authorData);
       if (response.status === 200) {
-        setAlert(true);
+        setAlertType("success");
+        setAlertMessage("You are an author now");
       }
     } catch (err) {
+      setAlertMessage(err.response.data.message);
+      setAlertType("danger");
       console.error(err);
     }
   };
@@ -71,21 +76,19 @@ export default function ProfileInfo({
 
   const handleRemoveGenre = (e, index) => {
     e.preventDefault();
-    setGenres(genres.filter((_, i) => i !== index))
+    setGenres(genres.filter((_, i) => i !== index));
   };
 
-
   return (
-    <Container>
       <Row className="justify-content-center">
-        <Col className="w-75 mx-auto">
+        <Col className="mx-auto">
           {becomeAuthor && (
             <div className="background-blur">
               <div className="form-center">
                 <div className="d-flex align-items-center">
-                  {alert && (
-                    <Alert className="ms-auto" variant="success">
-                      You are an author now
+                  {alertMessage && (
+                    <Alert className="ms-auto" variant={alertType}>
+                      {alertMessage}
                     </Alert>
                   )}
                   <Button
@@ -131,7 +134,7 @@ export default function ProfileInfo({
                         key={index}
                         className="me-1"
                         onClick={(e) => handleRemoveGenre(e, index)}
-                        style={{cursor: "pointer"}}
+                        style={{ cursor: "pointer" }}
                       >
                         {genre}
                       </Badge>
@@ -180,8 +183,9 @@ export default function ProfileInfo({
                 id="imageUpload"
                 onChange={onImageChange}
               />
-              <Card.Title className="display-6 text-center">
+              <Card.Title className="display-6 text-center d-flex justify-content-center align-items-center">
                 {username}
+                {isAuthor && <i className="bi bi-star-fill fs-4 ms-2" style={{color: "cyan"}}></i>}
               </Card.Title>
               <div className="d-flex flex-column flex-sm-row align-items-center justify-content-evenly mb-3 ms-auto">
                 <Button variant="danger" onClick={onLogout}>
@@ -202,6 +206,5 @@ export default function ProfileInfo({
           </Card>
         </Col>
       </Row>
-    </Container>
   );
 }
