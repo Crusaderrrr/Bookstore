@@ -16,9 +16,8 @@ public class CloudinaryService {
   @Autowired private Cloudinary cloudinary;
 
   public Map uploadFile(MultipartFile file) throws IOException {
-    File convFile = convertMultiPartToFile(file);
-    Map uploadResult = cloudinary.uploader().upload(convFile, ObjectUtils.emptyMap());
-    convFile.delete(); 
+    byte[] fileBytes = file.getBytes();
+    Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.emptyMap());
     return uploadResult;
   }
 
