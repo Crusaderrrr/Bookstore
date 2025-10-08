@@ -45,10 +45,17 @@ public class RefreshService {
   public RefreshToken verifyExpiration(RefreshToken token) {
     if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
       refreshTokenRepository.delete(token);
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Refresh token was expired. Please make a new signin request");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please make a new signin request");
     }
     return token;
+  }
+
+  public RefreshToken getRefreshToken(String token) {
+    return refreshTokenRepository.findByToken(token).orElse(null);
+  }
+
+  public User getUserFromRefreshToken(String token) {
+    return refreshTokenRepository.findByToken(token).get().getUser();
   }
 
   @Transactional

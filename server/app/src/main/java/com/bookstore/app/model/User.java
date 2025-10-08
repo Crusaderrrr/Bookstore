@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
@@ -20,13 +19,13 @@ public class User {
   private int id;
 
   @NotEmpty(message = "Username is required")
+  @Column(unique = true)
   private String username;
 
   @Email(message = "Please provide a valid email")
   @Column(unique = true)
   private String email;
 
-  @NotBlank(message = "Password is required")
   private String password;
 
   private String roles;

@@ -1,5 +1,6 @@
 package com.bookstore.app.service;
 
+import com.bookstore.app.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -9,24 +10,31 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JWTService {
 
-  private String secretKey = "9t4k+N1v8VzW9sz6Z+xY0Q7j36LmVmriYqvfrHDLncA=";
+  @Value("${JWT_SECRET_KEY}")
+  private String secretKey;
 
-  public String generateToken(String username) {
+  public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
+    claims.put("roles", user.getRoles());
 
     return Jwts.builder()
         .setClaims(claims)
-        .setSubject(username)
+        .setSubject(user.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
         .signWith(getKey())
         .compact();
+  }
+
+  public String extractRoles(String token) {
+    return extractAllClaims(token).get("roles", String.class);
   }
 
   public Key getKey() {
