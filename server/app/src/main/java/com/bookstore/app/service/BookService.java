@@ -16,10 +16,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class BookService {
   private final BookRepo bookRepo;
   private final BookImageService bookImageService;
+  private final CloudinaryService cloudinaryService;
 
-  public BookService(BookRepo bookRepo, BookImageService bookImageService) {
+  public BookService(
+      BookRepo bookRepo, BookImageService bookImageService, CloudinaryService cloudinaryService) {
     this.bookRepo = bookRepo;
     this.bookImageService = bookImageService;
+    this.cloudinaryService = cloudinaryService;
   }
 
   public Book getBookById(Long id) throws EntityNotFoundException {
@@ -49,5 +52,18 @@ public class BookService {
 
   public List<Book> searchBooksByTitle(String keyword) {
     return bookRepo.findByTitleContainingIgnoreCase(keyword);
+  }
+
+  @Transactional
+  public void deleteBooksById(List<Long> bookIds) throws IOException {
+    List<Book> books = bookRepo.findAllById(bookIds);
+
+    for (Book book : books) {
+      if (book.getBookImage() != null) {
+        cloudinaryService.deleteFile(book.getBookImage().getPublicId());
+      }
+    }
+    bookRepo.deleteAll(books);
+    bookRepo.flush();
   }
 }

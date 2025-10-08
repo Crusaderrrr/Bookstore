@@ -10,6 +10,7 @@ import java.security.Principal;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,4 +59,26 @@ public class BookController {
     List<Book> books = bookService.searchBooksByTitle(query);
     return ResponseEntity.ok(books);
   }
+
+  @PostMapping("/add-books")
+  public ResponseEntity<String> addBooks(@RequestBody List<Book> books, Principal principal)
+      throws IOException {
+    Author author = authorService.getAuthorByUsername(principal.getName());
+    for (Book book : books) {
+      try {
+        bookService.saveBook(book, author, null);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    return ResponseEntity.ok("Books added");
+  }
+
+  @PostMapping("/delete")
+  @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR')")
+  public ResponseEntity<String> deleteBooks(@RequestBody List<Long> bookIds) throws IOException {
+    bookService.deleteBooksById(bookIds);
+    return ResponseEntity.ok("Books deleted");
+  }
+  
 }

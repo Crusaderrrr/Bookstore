@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
+// import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
@@ -10,16 +10,26 @@ import axiosInstance from "../config/axiosConfig";
 import AsyncSelect from "react-select/async";
 import { components } from "react-select";
 import { FaSearch } from "react-icons/fa";
+import Button from "@mui/material/Button";
+import LoginIcon from "@mui/icons-material/Login";
+import IconButton from "@mui/material/IconButton";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import PersonIcon from "@mui/icons-material/Person";
+import StoreIcon from "@mui/icons-material/Store";
+import BedtimeIcon from "@mui/icons-material/Bedtime";
+import SunnyIcon from "@mui/icons-material/Sunny";
+import SearchIcon from "@mui/icons-material/Search";
+import { styled, alpha } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
 
 export default function AppNavbar() {
   const { theme, toggleTheme, isLoggedIn } = useContext(AppContext);
   const { role } = useContext(AppContext);
   const isAdmin = role === "ADMIN";
-  const [options, setOptions] = useState([]);
-  const [inputValue, setInputValue] = useState("");
-  const [selectedOption, setSelectedOption] = useState("");
   const navigate = useNavigate();
   const isDarkMode = theme === "dark";
+  const [options, setOptions] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
 
   const IconControl = (props) => (
     <components.Control {...props}>
@@ -36,20 +46,18 @@ export default function AppNavbar() {
       const response = await axiosInstance.get("/books/search", {
         params: { q: inputValue },
       });
-      return response.data.map((book) => ({
-        value: book.id,
-        label: book.title,
-        description: book.description,
-      }));
+      setOptions(response.data);
     } catch (error) {
       console.error("Search failed:", error);
       return [];
     }
   };
 
-  const handleChange = (selectedOption) => {
-    if (selectedOption) {
-      navigate(`/books/${selectedOption.value}`, { state: { mode: "view" } });
+  const handleToggleTheme = () => {
+    if (theme === "dark") {
+      toggleTheme();
+    } else {
+      return;
     }
   };
 
@@ -64,7 +72,7 @@ export default function AppNavbar() {
       width: "100%",
       minHeight: 40,
       boxSizing: "border-box",
-      backgroundColor: isDarkMode ? "#1a202c" : "#fff", // dark bg for control
+      backgroundColor: isDarkMode ? "#1a202c" : "#fff",
       borderColor: isDarkMode ? "#4a5568" : base.borderColor,
       color: isDarkMode ? "#eee" : base.color,
     }),
@@ -136,6 +144,52 @@ export default function AppNavbar() {
     }),
   };
 
+  const handleInputChange = (value) => {
+    setSearchInput(value);
+    loadOptions(value);
+  };
+
+  const Search = styled("div")(({ theme }) => ({
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.black, 0.1),
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.common.black, 0.15),
+    },
+    marginLeft: 0,
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: theme.spacing(1),
+      width: "auto",
+    },
+  }));
+
+  const SearchIconWrapper = styled("div")(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }));
+
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: "inherit",
+    width: "100%",
+    "& .MuiInputBase-input": {
+      padding: theme.spacing(1, 10, 1, 0),
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create("width"),
+      [theme.breakpoints.up("sm")]: {
+        width: "20ch",
+        "&:focus": {
+          width: "45ch",
+        },
+      },
+    },
+  }));
+
   return (
     <Navbar bg={theme} variant={theme} expand="lg">
       <Container fluid>
@@ -149,53 +203,76 @@ export default function AppNavbar() {
             style={{ maxHeight: "100px" }}
             navbarScroll
           >
-            {isLoggedIn && (
-              <Nav.Link as={Link} to="/profile">
-                My Profile <i className="bi bi-person"></i>
-              </Nav.Link>
-            )}
-            <Nav.Link as={Link} to="/shop">
-              Shop
-            </Nav.Link>
-            {isLoggedIn ? (
-              <Nav.Link as={Link} to="/cart">
-                <i className="bi bi-cart" role="img" aria-label="Cart" />
-              </Nav.Link>
-            ) : (
-              <Nav.Link
-                as={Link}
-                to="/login"
-                onClick={theme === "dark" ? toggleTheme : null}
-              >
-                Login
-              </Nav.Link>
-            )}
-            <Nav.Link onClick={toggleTheme} style={{ cursor: "pointer" }}>
-              {theme === "dark" ? (
-                <i className="bi bi-moon-fill"></i>
-              ) : (
-                <i className="bi bi-sun-fill"></i>
-              )}
-            </Nav.Link>
+            <IconButton
+              onClick={toggleTheme}
+              style={{ cursor: "pointer" }}
+              size="small"
+            >
+              {theme === "dark" ? <BedtimeIcon /> : <SunnyIcon />}
+            </IconButton>
           </Nav>
           {isAdmin && (
             <Nav.Link as={Link} to="/admin" className="me-2">
               <i className="bi bi-gear"></i>
             </Nav.Link>
           )}
-          <AsyncSelect
-            cacheOptions
-            loadOptions={loadOptions}
-            onChange={handleChange}
-            placeholder="Search for a book..."
-            components={{
-              Control: IconControl,
-              DropdownIndicator: () => null,
-              IndicatorSeparator: () => null,
-            }}
-            styles={fixedWidthStyles}
-            noOptionsMessage={() => "No books found"}
-          />
+          {/* <div className="d-flex me-auto">
+            <AsyncSelect
+              cacheOptions
+              loadOptions={loadOptions}
+              onChange={handleChange}
+              placeholder="Search for a book..."
+              components={{
+                Control: IconControl,
+                DropdownIndicator: () => null,
+                IndicatorSeparator: () => null,
+              }}
+              styles={fixedWidthStyles}
+              noOptionsMessage={() => "No books found"}
+            />
+          </div> */}
+          <div className="me-auto">
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                onChange={e => handleInputChange(e.target.value)}
+                value={searchInput}
+              />
+            </Search>
+          </div>
+          <IconButton component={Link} to="/shop">
+            <StoreIcon />
+          </IconButton>
+
+          {isLoggedIn ? (
+            <IconButton size="small" component={Link} to="/cart">
+              <ShoppingCartIcon style={{ width: "21px", height: "21px" }} />
+            </IconButton>
+          ) : (
+            <Button
+              variant="outlined"
+              size="small"
+              endIcon={<LoginIcon />}
+              component={Link}
+              to="/login"
+              onClick={handleToggleTheme}
+            >
+              Login
+            </Button>
+          )}
+          {isLoggedIn && (
+            <IconButton
+              component={Link}
+              to="/profile"
+              className="me-1"
+              color="primary"
+            >
+              <PersonIcon />
+            </IconButton>
+          )}
         </Navbar.Collapse>
       </Container>
     </Navbar>

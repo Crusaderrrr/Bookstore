@@ -1,8 +1,14 @@
-import React, { useState } from "react";
-import { Button, ButtonGroup, Col, Form, Row } from "react-bootstrap";
+import React, { use, useContext, useState } from "react";
+import { Col, Form, Row, Alert } from "react-bootstrap";
 import BookCard from "../BookCard";
 import "../../style/authorForm.css";
 import axiosInstance from "../../config/axiosConfig";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Button from "@mui/material/Button";
+import { AppContext } from "../../context/AppContext";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import Checkbox from "@mui/material/Checkbox";
 
 export default function MyBooks({ books }) {
   const [createBook, setCreateBook] = useState(false);
@@ -12,13 +18,31 @@ export default function MyBooks({ books }) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [file, setFile] = useState(null);
+  const { theme } = useContext(AppContext);
+  const [loading, setLoading] = useState(false);
+  const [selectedBooks, setSelectedBooks] = useState([]);
+
+  const handleToggleAll = () => {
+    if (selectedBooks.length !== books.length) {
+      setSelectedBooks(books.map((book) => book.id));
+    } else {
+      setSelectedBooks([]);
+    }
+  };
+
+  const handleCheckboxChange = (bookId, isChecked) => {
+    if (isChecked) {
+      setSelectedBooks([...selectedBooks, bookId]);
+    } else {
+      setSelectedBooks(selectedBooks.filter((id) => id !== bookId));
+    }
+  };
 
   const handleSubmitBook = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!file) {
-      setAlertType("danger");
-      setAlertMessage("Please select an image.");
       return;
     }
 
@@ -41,9 +65,8 @@ export default function MyBooks({ books }) {
       });
       if (response.status === 200) {
         setAlertType("success");
-        setAlertMessage("Book created successfully");
+        setAlertMessage("Book uploaded successfully");
       }
-      setCreateBook(false);
     } catch (err) {
       console.error(err);
       setAlertMessage("Error creating book");
@@ -58,15 +81,35 @@ export default function MyBooks({ books }) {
     }
   };
 
+  const handleDeleteSelected = async () => {
+    try {
+      const response = await axiosInstance.post("/books/delete", selectedBooks);
+      console.log(response)
+      if (response.status === 200) {
+        setSelectedBooks([]);
+        // window.location.reload();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+
   return (
     <>
       <div className="d-flex align-items-center mt-3">
         <h1 className="ms-3 mt-2 display-6">My Books</h1>
+        <Checkbox className="mt-2" onChange={handleToggleAll}/>
         <ButtonGroup className="ms-auto">
-          <Button variant="outline-success" onClick={() => setCreateBook(true)}>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick={() => setCreateBook(true)}
+          >
             +
           </Button>
-          <Button variant="outline-danger">
+          <Button color="error" onClick={handleDeleteSelected}>
             <i className="bi bi-trash3"></i>
           </Button>
         </ButtonGroup>
@@ -74,28 +117,36 @@ export default function MyBooks({ books }) {
       <Row className="mt-3">
         {books.map((book) => (
           <Col key={book.id} xs={12} md={4} className="mb-4">
-            <BookCard book={book} />
+            <BookCard
+              book={book}
+              showCheck={true}
+              isChecked={selectedBooks.includes(book.id)}
+              onCheckboxChange={handleCheckboxChange}
+            />
           </Col>
         ))}
       </Row>
       {createBook && (
         <div className="background-blur">
-          <div className="form-center">
+          <div
+            className={`form-center bg-${theme === "dark" ? "dark" : "light"}`}
+          >
             <div className="d-flex align-items-center">
               {alertMessage && (
-                <Alert className="ms-auto" variant={alertType}>
+                <Alert className="p-relative ms-auto" variant={alertType}>
                   {alertMessage}
                 </Alert>
               )}
-              <Button
+              <IconButton
                 variant="outline-secondary"
                 size="sm"
                 className="ms-auto mb-2 "
                 onClick={() => setCreateBook(false)}
               >
-                X
-              </Button>
+                <CloseIcon />
+              </IconButton>
             </div>
+
             <Form onSubmit={handleSubmitBook}>
               <Form.Group className="mb-3">
                 <Form.Label>Book Image</Form.Label>
@@ -112,6 +163,7 @@ export default function MyBooks({ books }) {
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  required
                 />
               </Form.Group>
               <Form.Group className="mb-3">
@@ -120,6 +172,7 @@ export default function MyBooks({ books }) {
                   type="text"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  required
                 />
               </Form.Group>
               <Form.Group className="mb-3">
@@ -128,11 +181,13 @@ export default function MyBooks({ books }) {
                   type="text"
                   value={price}
                   onChange={handlePriceChange}
+                  required
                 />
               </Form.Group>
 
               <Button
-                variant="primary"
+                variant="contained"
+                color="success"
                 type="submit"
                 className="d-flex mx-auto"
               >

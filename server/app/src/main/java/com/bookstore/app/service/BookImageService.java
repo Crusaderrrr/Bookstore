@@ -3,6 +3,7 @@ package com.bookstore.app.service;
 import com.bookstore.app.model.Book;
 import com.bookstore.app.model.BookImage;
 import com.bookstore.app.repo.BookImageRepo;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.util.Map;
 import org.springframework.stereotype.Service;

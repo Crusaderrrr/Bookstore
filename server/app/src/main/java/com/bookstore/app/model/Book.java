@@ -38,7 +38,7 @@ public class Book {
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate datePosted;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id")
   @JsonBackReference
   private Author author;
@@ -51,7 +51,12 @@ public class Book {
     return info;
   }
 
-  @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+  @OneToOne(
+      mappedBy = "book",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      optional = true,
+      orphanRemoval = true)
   @JsonManagedReference
   private BookImage bookImage;
 }

@@ -1,5 +1,6 @@
 .book-cover {
   max-height: 500px;
+  max-width: 350px;
 }
 
 .card-image-container {
@@ -20,9 +21,15 @@
 .custom-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  position: relative;
 }
 
 .custom-card:hover {
   transform: scale(1.05);         
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);  
+}
+
+.checkbox-top-left {
+  position: relative;
+  margin-right: auto;
 }
