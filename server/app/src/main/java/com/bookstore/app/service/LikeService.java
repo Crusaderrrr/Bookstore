@@ -4,7 +4,6 @@ import com.bookstore.app.model.Book;
 import com.bookstore.app.model.Like;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.LikeRepo;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +25,7 @@ public class LikeService {
 
   @Transactional
   public void addLikeForBook(Long bookId, String username) {
-    Book book =
-        bookService
-            .getBookById(bookId);
+    Book book = bookService.getBookById(bookId);
     User user = userService.findByUsername(username);
     Like like = new Like();
     like.setBook(book);
