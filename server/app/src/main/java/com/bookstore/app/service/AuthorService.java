@@ -34,4 +34,8 @@ public class AuthorService {
     User user = userService.findByUsername(username);
     return authorRepo.findByUserId(user.getId());
   }
+
+  public Optional<Author> getAuthorByAuthorName(String authorName) {
+    return authorRepo.findByName(authorName);
+  }
 }

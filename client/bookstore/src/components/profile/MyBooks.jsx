@@ -1,4 +1,4 @@
-import React, { use, useContext, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import { Col, Form, Row, Alert } from "react-bootstrap";
 import BookCard from "../BookCard";
 import "../../style/authorForm.css";
@@ -21,6 +21,27 @@ export default function MyBooks({ books }) {
   const { theme } = useContext(AppContext);
   const [loading, setLoading] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState([]);
+  const [genres, setGenres] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState("");
+
+  useEffect(() => {
+    async function fetchGenres() {
+      try {
+        const response = await axiosInstance.get("/genres");
+        setGenres(response.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchGenres();
+  }, []);
+
+  const formatGenreName = (genre) => {
+    return genre
+      .split("_")
+      .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(" ");
+  };
 
   const handleToggleAll = () => {
     if (selectedBooks.length !== books.length) {
@@ -38,6 +59,16 @@ export default function MyBooks({ books }) {
     }
   };
 
+  const handleCloseBookForm = () => {
+    setAlertMessage("");
+    setCreateBook(false);
+    setTitle("");
+    setDescription("");
+    setPrice("");
+    setFile(null);
+    setSelectedGenre("");
+  };
+
   const handleSubmitBook = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -46,26 +77,25 @@ export default function MyBooks({ books }) {
       return;
     }
 
-    const bookData = {
-      title,
-      description,
-      price,
-    };
-
     const formData = new FormData();
-    formData.append(
-      "book",
-      new Blob([JSON.stringify(bookData)], { type: "application/json" })
-    );
-    formData.append("file", file);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("image", file);
+    formData.append("genre", selectedGenre);
 
     try {
-      const response = await axiosInstance.post("/books/new", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axiosInstance.post(
+        "/moderation/requests/new",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       if (response.status === 200) {
         setAlertType("success");
-        setAlertMessage("Book uploaded successfully");
+        setAlertMessage("Request created successfully!");
+        setLoading(false);
       }
     } catch (err) {
       console.error(err);
@@ -84,23 +114,21 @@ export default function MyBooks({ books }) {
   const handleDeleteSelected = async () => {
     try {
       const response = await axiosInstance.post("/books/delete", selectedBooks);
-      console.log(response)
+      console.log(response);
       if (response.status === 200) {
         setSelectedBooks([]);
-        // window.location.reload();
+        window.location.reload();
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-
-
   return (
     <>
       <div className="d-flex align-items-center mt-3">
         <h1 className="ms-3 mt-2 display-6">My Books</h1>
-        <Checkbox className="mt-2" onChange={handleToggleAll}/>
+        <Checkbox className="mt-2" onChange={handleToggleAll} />
         <ButtonGroup className="ms-auto">
           <Button
             variant="outlined"
@@ -141,7 +169,7 @@ export default function MyBooks({ books }) {
                 variant="outline-secondary"
                 size="sm"
                 className="ms-auto mb-2 "
-                onClick={() => setCreateBook(false)}
+                onClick={handleCloseBookForm}
               >
                 <CloseIcon />
               </IconButton>
@@ -176,6 +204,21 @@ export default function MyBooks({ books }) {
                 />
               </Form.Group>
               <Form.Group className="mb-3">
+                <Form.Label>Genre</Form.Label>
+                <Form.Select
+                  value={selectedGenre}
+                  onChange={(e) => setSelectedGenre(e.target.value)}
+                  required
+                >
+                  <option value="">Select genre</option>
+                  {genres.map((genre) => (
+                    <option key={genre} value={genre}>
+                      {formatGenreName(genre)}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3">
                 <Form.Label>Price</Form.Label>
                 <Form.Control
                   type="text"
@@ -190,8 +233,10 @@ export default function MyBooks({ books }) {
                 color="success"
                 type="submit"
                 className="d-flex mx-auto"
+                loading={loading}
+                loadingPosition="end"
               >
-                Submit
+                Request
               </Button>
             </Form>
           </div>

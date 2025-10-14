@@ -1,19 +1,18 @@
-import React, { useState } from "react";
-import {
-  Alert,
-  Badge,
-  Button,
-  ButtonGroup,
-  Card,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-} from "react-bootstrap";
+import React, { useContext, useState } from "react";
+import { Alert, Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import default_profile_image from "../../assets/default_profile_image.jpg";
 import "../../style/authorForm.css";
 import axiosInstance from "../../config/axiosConfig";
+import { Typography, Grid, Avatar, Menu, MenuItem, Badge } from "@mui/material";
+import { default as MuiButton } from "@mui/material/Button";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import LogoutIcon from "@mui/icons-material/Logout";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import MessageIcon from "@mui/icons-material/Message";
+import CloseIcon from "@mui/icons-material/Close";
+import IconButton from "@mui/material/IconButton";
+import { AppContext } from "../../context/AppContext";
 
 export default function ProfileInfo({
   username,
@@ -22,16 +21,28 @@ export default function ProfileInfo({
   image,
   onImageChange,
   isAuthor,
+  toggleDrawer,
+  anchorEl,
+  setAnchorEl,
+  setIsAuthor,
 }) {
+  const { theme } = useContext(AppContext);
   const [becomeAuthor, setBecomeAuthor] = useState(false);
   const [name, setName] = React.useState("");
   const [surname, setSurname] = React.useState("");
-  const [genres, setGenres] = React.useState([]);
   const [bio, setBio] = React.useState("");
   const [pseudonym, setPseudonym] = React.useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
-  const [currentGenre, setCurrentGenre] = useState("");
+  const open = Boolean(anchorEl);
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleSubmitAuthor = async (event) => {
     event.preventDefault();
@@ -39,18 +50,16 @@ export default function ProfileInfo({
     const authorData = {
       name,
       surname,
-      genres,
       bio,
       pseudonym,
     };
-
-    console.log(authorData);
 
     try {
       const response = await axiosInstance.post("/authors/new", authorData);
       if (response.status === 200) {
         setAlertType("success");
         setAlertMessage("You are an author now");
+        setIsAuthor(true);
       }
     } catch (err) {
       setAlertMessage(err.response.data.message);
@@ -61,150 +70,170 @@ export default function ProfileInfo({
 
   const handleBecomeAuthor = () => {
     setBecomeAuthor(!becomeAuthor);
-  };
-
-  const handleChange = (e) => {
-    setCurrentGenre(e.target.value);
-  };
-
-  const handleAddGenre = (e) => {
-    e.preventDefault();
-    if (currentGenre.trim() === "") return;
-    setGenres([...genres, currentGenre.trim()]);
-    setCurrentGenre("");
-  };
-
-  const handleRemoveGenre = (e, index) => {
-    e.preventDefault();
-    setGenres(genres.filter((_, i) => i !== index));
+    handleMenuClose();
   };
 
   return (
-      <Row className="justify-content-center">
-        <Col className="mx-auto">
-          {becomeAuthor && (
-            <div className="background-blur">
-              <div className="form-center">
-                <div className="d-flex align-items-center">
-                  {alertMessage && (
-                    <Alert className="ms-auto" variant={alertType}>
-                      {alertMessage}
-                    </Alert>
-                  )}
-                  <Button
-                    variant="outline-secondary"
-                    size="sm"
-                    className="ms-auto mb-2 "
-                    onClick={() => setBecomeAuthor(false)}
-                  >
-                    X
-                  </Button>
-                </div>
-                <Form onSubmit={handleSubmitAuthor}>
-                  <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Surname</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={surname}
-                      onChange={(e) => setSurname(e.target.value)}
-                    />
-                  </Form.Group>
-                  <InputGroup className="mb-1">
-                    <Form.Control
-                      placeholder="Enter genre"
-                      aria-label="Book genre"
-                      value={currentGenre}
-                      onChange={handleChange}
-                    />
-                    <Button variant="primary" onClick={handleAddGenre}>
-                      Add
-                    </Button>
-                  </InputGroup>
-                  <div className="mb-3 d-flex flex-wrap">
-                    {genres.map((genre, index) => (
-                      <Badge
-                        key={index}
-                        className="me-1"
-                        onClick={(e) => handleRemoveGenre(e, index)}
-                        style={{ cursor: "pointer" }}
-                      >
-                        {genre}
-                      </Badge>
-                    ))}
-                  </div>
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Enter your Bio</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Pseudonym</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={pseudonym}
-                      onChange={(e) => setPseudonym(e.target.value)}
-                    />
-                  </Form.Group>
-
-                  <Button
-                    variant="primary"
-                    type="submit"
-                    className="d-flex mx-auto"
-                  >
-                    Submit
-                  </Button>
-                </Form>
+    <Row className="justify-content-center">
+      <Col className="mx-auto">
+        <input
+          type="file"
+          accept="image/*"
+          style={{ display: "none" }}
+          id="imageUpload"
+          onChange={onImageChange}
+        />
+        {becomeAuthor && (
+          <div className="background-blur">
+            <div
+              className={`form-center bg-${
+                theme === "dark" ? "dark" : "white"
+              }`}
+            >
+              <div className="d-flex align-items-center">
+                {alertMessage && (
+                  <Alert className="ms-auto" variant={alertType}>
+                    {alertMessage}
+                  </Alert>
+                )}
+                <IconButton
+                  variant="outline"
+                  size="small"
+                  className="ms-auto"
+                  onClick={() => setBecomeAuthor(false)}
+                >
+                  <CloseIcon />
+                </IconButton>
               </div>
-            </div>
-          )}
-          <Card className="text-center">
-            <Card.Header>User Info</Card.Header>
-            <Card.Body>
-              <Card.Img
-                className="rounded-circle mb-2 mt-2 text-center"
-                style={{ width: "110px", height: "110px" }}
-                src={image || default_profile_image}
-              />
-              <input
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                id="imageUpload"
-                onChange={onImageChange}
-              />
-              <Card.Title className="display-6 text-center d-flex justify-content-center align-items-center">
-                {username}
-                {isAuthor && <i className="bi bi-star-fill fs-4 ms-2" style={{color: "cyan"}}></i>}
-              </Card.Title>
-              <div className="d-flex flex-column flex-sm-row align-items-center justify-content-evenly mb-3 ms-auto">
-                <Button variant="danger" onClick={onLogout}>
-                  Logout
-                </Button>
+              <Form onSubmit={handleSubmitAuthor}>
+                <Form.Group className="mb-3" controlId="formBasicEmail">
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                  <Form.Label>Surname</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={surname}
+                    onChange={(e) => setSurname(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                  <Form.Label>Enter your Bio</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                  <Form.Label>Pseudonym</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={pseudonym}
+                    onChange={(e) => setPseudonym(e.target.value)}
+                  />
+                </Form.Group>
+
                 <Button
                   variant="primary"
-                  className="mt-2 mt-sm-0"
+                  type="submit"
+                  className="d-flex mx-auto"
+                >
+                  Submit
+                </Button>
+              </Form>
+            </div>
+          </div>
+        )}
+
+        <>
+          <Grid
+            container
+            spacing={2}
+            alignItems="center"
+            direction={{ xs: "column", md: "row" }}
+            sx={{
+              p: 2,
+              borderRadius: 2,
+              boxShadow: 2,
+            }}
+          >
+            <Grid item>
+              <Avatar
+                alt={username}
+                src={image || default_profile_image}
+                sx={{ width: 80, height: 80, marginRight: "auto" }}
+              />
+            </Grid>
+
+            <Grid item>
+              <Typography
+                variant="h6"
+                sx={{ textAlign: { xs: "center", md: "left" } }}
+              >
+                {username}{" "}
+                {isAuthor && (
+                  <VerifiedIcon
+                    className="ms-0 mb-1"
+                    sx={{
+                      fontSize: 16,
+                      color: "#1e88e5",
+                    }}
+                  />
+                )}
+              </Typography>
+              <Typography variant="body2">{email}</Typography>
+            </Grid>
+
+            <Grid
+              item
+              sx={{
+                mx: { xs: "auto", sm: "auto", md: "auto", lg: "initial" },
+                ml: { lg: "auto" },
+              }}
+            >
+              <MuiButton
+                variant="outlined"
+                onClick={handleMenuClick}
+                endIcon={<KeyboardArrowDownIcon />}
+              >
+                Options
+              </MuiButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
+              >
+                <MenuItem onClick={onLogout}>
+                  Logout {<LogoutIcon className="ms-2" fontSize="small" />}
+                </MenuItem>
+                <MenuItem
                   onClick={() => document.getElementById("imageUpload").click()}
                 >
-                  Change Image
-                </Button>
-                <Button className="mt-2 mt-sm-0" onClick={handleBecomeAuthor}>
-                  Author
-                </Button>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+                  Image {<FileUploadIcon className="ms-2" fontSize="small" />}
+                </MenuItem>
+                {isAuthor && (
+                  <MenuItem onClick={() => toggleDrawer(true)}>
+                    Requests {<MessageIcon className="ms-2" fontSize="small" />}
+                  </MenuItem>
+                )}
+                {!isAuthor && (
+                  <MenuItem onClick={handleBecomeAuthor}>
+                    Author {<VerifiedIcon className="ms-2" fontSize="small" />}
+                  </MenuItem>
+                )}
+              </Menu>
+            </Grid>
+          </Grid>
+        </>
+      </Col>
+    </Row>
   );
 }

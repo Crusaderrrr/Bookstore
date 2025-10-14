@@ -3,6 +3,7 @@ package com.bookstore.app.service;
 import com.bookstore.app.model.Author;
 import com.bookstore.app.model.Book;
 import com.bookstore.app.model.BookImage;
+import com.bookstore.app.model.Genre;
 import com.bookstore.app.repo.BookRepo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class BookService {
@@ -36,11 +36,9 @@ public class BookService {
   }
 
   @Transactional
-  public void saveBook(Book book, Author author, MultipartFile file) throws IOException {
-    if (file != null && !file.isEmpty()) {
-      BookImage image = bookImageService.saveBookImage(file, book);
-      book.setBookImage(image);
-    }
+  public void saveBook(Book book, Author author, BookImage bookImage) {
+    bookImage.setBook(book);
+    book.setBookImage(bookImage);
     book.setAuthor(author);
     book.setDatePosted(LocalDate.now());
     bookRepo.save(book);
@@ -50,8 +48,12 @@ public class BookService {
     return bookRepo.findByAuthor(author);
   }
 
-  public List<Book> searchBooksByTitle(String keyword) {
+  public List<Book> findBooksByTitle(String keyword) {
     return bookRepo.findByTitleContainingIgnoreCase(keyword);
+  }
+
+  public List<Book> findBookByTitleAndGenre(String title, Genre genre) {
+    return bookRepo.findByTitleContainingIgnoreCaseAndGenre(title, genre);
   }
 
   @Transactional

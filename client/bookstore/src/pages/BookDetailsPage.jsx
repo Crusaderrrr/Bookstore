@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../config/axiosConfig";
 import {
@@ -11,22 +11,34 @@ import {
   Row,
 } from "react-bootstrap";
 import "../style/bookStyle.css";
+import { AppContext } from "../context/AppContext";
 
 export default function BookDetailsPage() {
+  const { isLoggedIn } = useContext(AppContext);
   const { id } = useParams();
   const [book, setBook] = useState({});
+  const [genre, setGenre] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
   const [buttonText, setButtonText] = useState("Add to Cart");
-  const default_book_cover = "https://res.cloudinary.com/dupcshdti/image/upload/v1759743713/book_cover_rllhzg.jpg";
+  const default_book_cover =
+    "https://res.cloudinary.com/dupcshdti/image/upload/v1759743713/book_cover_rllhzg.jpg";
   const min = 1;
   const max = 30;
+
+  const formatGenreName = (genre) => {
+    return genre
+      .split("_")
+      .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(" ");
+  };
 
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
         const response = await axiosInstance.get(`/books/${id}`);
         setBook(response.data);
+        setGenre(formatGenreName(response.data.genre));
       } catch (err) {
         console.error("Error fetching book details:", err);
       }
@@ -37,7 +49,9 @@ export default function BookDetailsPage() {
   const handleToggleLike = async () => {
     if (isLiked) {
       try {
-        const response = await axiosInstance.post("/likes/remove", {bookId : id});
+        const response = await axiosInstance.post("/likes/remove", {
+          bookId: id,
+        });
         if (response.status === 200) {
           setIsLiked(false);
         }
@@ -46,7 +60,7 @@ export default function BookDetailsPage() {
       }
     } else {
       try {
-        const response = await axiosInstance.post("/likes/add", {bookId : id});
+        const response = await axiosInstance.post("/likes/add", { bookId: id });
         if (response.status === 200) {
           setIsLiked(true);
         }
@@ -80,11 +94,28 @@ export default function BookDetailsPage() {
     <Container>
       <Row className="align-items-center">
         <Col className="text-center mt-5">
-          <img src={book.bookImage?.url || default_book_cover} alt="" className="book-cover" />
+          <img
+            src={book.bookImage?.url || default_book_cover}
+            alt=""
+            className="book-cover"
+          />
           <div className="d-flex mt-2 mb-3">
-            <Button className="mx-auto text-danger" variant="link" onClick={handleToggleLike}>
-              {isLiked ? <i className="bi bi-heart-fill" style={{ fontSize: "1.5rem" }}></i> : <i className="bi bi-heart" style={{ fontSize: "1.5rem" }}></i>}
-            </Button>
+            {isLoggedIn && (
+              <Button
+                className="mx-auto text-danger"
+                variant="link"
+                onClick={handleToggleLike}
+              >
+                {isLiked ? (
+                  <i
+                    className="bi bi-heart-fill"
+                    style={{ fontSize: "1.5rem" }}
+                  ></i>
+                ) : (
+                  <i className="bi bi-heart" style={{ fontSize: "1.5rem" }}></i>
+                )}
+              </Button>
+            )}
           </div>
         </Col>
         <Col lg={6} className="text-center text-lg-start">
@@ -94,7 +125,9 @@ export default function BookDetailsPage() {
               By {book.authorInfo?.surname} {book.authorInfo?.name}
             </span>
           </div>
-          <h3 className=" mt-4">Description</h3>
+          <h3>Genre</h3>
+          <p>{genre}</p>
+          <h3 className="mt-3">Description</h3>
           <p>{book?.description}</p>
           <h3 className="d-inline">Price:</h3>
           <span className="ms-2 fs-5">{book.price}$</span>
@@ -115,7 +148,11 @@ export default function BookDetailsPage() {
                 style={{ textAlign: "center" }}
               />
             </InputGroup>
-            <Button className="ms-3" variant={buttonText === "Added to Cart" ? "success" : "primary"} onClick={handleAddToCart}>
+            <Button
+              className="ms-3"
+              variant={buttonText === "Added to Cart" ? "success" : "primary"}
+              onClick={handleAddToCart}
+            >
               {buttonText}
             </Button>
           </div>

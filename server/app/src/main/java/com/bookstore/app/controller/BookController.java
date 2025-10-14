@@ -2,13 +2,12 @@ package com.bookstore.app.controller;
 
 import com.bookstore.app.model.Author;
 import com.bookstore.app.model.Book;
+import com.bookstore.app.model.Genre;
 import com.bookstore.app.service.AuthorService;
 import com.bookstore.app.service.BookService;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/books")
@@ -42,21 +39,16 @@ public class BookController {
     return bookService.getBookById(id);
   }
 
-  @PostMapping(value = "/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<String> newBook(
-      @RequestPart("book") @Valid Book book,
-      @RequestPart("file") MultipartFile file,
-      Principal principal)
-      throws IOException {
-
-    Author author = authorService.getAuthorByUsername(principal.getName());
-    bookService.saveBook(book, author, file);
-    return ResponseEntity.ok("Book created");
-  }
-
   @GetMapping("/search")
-  public ResponseEntity<List<Book>> getMethodName(@RequestParam("q") String query) {
-    List<Book> books = bookService.searchBooksByTitle(query);
+  public ResponseEntity<List<Book>> getMethodName(
+      @RequestParam(value = "q", required = true) String query,
+      @RequestParam(value = "genre", required = false) Genre genre) {
+    List<Book> books = null;
+    if (query != null && genre != null) {
+      books = bookService.findBookByTitleAndGenre(query, genre);
+    } else if (query != null && genre == null) {
+      books = bookService.findBooksByTitle(query);
+    }
     return ResponseEntity.ok(books);
   }
 
@@ -65,11 +57,7 @@ public class BookController {
       throws IOException {
     Author author = authorService.getAuthorByUsername(principal.getName());
     for (Book book : books) {
-      try {
-        bookService.saveBook(book, author, null);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
+      bookService.saveBook(book, author, null);
     }
     return ResponseEntity.ok("Books added");
   }
@@ -80,5 +68,4 @@ public class BookController {
     bookService.deleteBooksById(bookIds);
     return ResponseEntity.ok("Books deleted");
   }
-  
 }

@@ -1,5 +1,7 @@
 package com.bookstore.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,6 +25,7 @@ import lombok.Data;
     name = "authors",
     uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
 @Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Author {
 
   @Id
@@ -43,15 +46,14 @@ public class Author {
   @JoinColumn(name = "user_id", nullable = true)
   private User user;
 
-  @NotEmpty(message = "Genres are required")
-  private List<String> genres = new ArrayList<>();
-
   @NotBlank(message = "Bio is required")
   private String bio;
-
-  private String image;
 
   @NotBlank(message = "Pseudonym is required")
   @Column(unique = true)
   private String pseudonym;
+
+  @OneToMany(mappedBy = "author")
+  @JsonIgnore
+  private List<ModerationRequest> moderationRequests = new ArrayList<>();
 }
