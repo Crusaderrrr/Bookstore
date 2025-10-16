@@ -6,7 +6,7 @@ import com.bookstore.app.model.CartItem;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.CartItemRepo;
 import com.bookstore.app.repo.CartRepo;
-import jakarta.persistence.EntityNotFoundException;
+import java.lang.foreign.Linker.Option;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class CartService {
   }
 
   public Cart getCartByUsername(String username) {
-    return cartRepo.findByUser_Username(username).orElseGet(() -> createCartForUser(username));
+    return cartRepo.findByUserUsername(username).orElseGet(() -> createCartForUser(username));
   }
 
   public Cart createCartForUser(String username) {
@@ -43,12 +43,9 @@ public class CartService {
 
   public Cart addToCart(String username, Long bookId, int quantity) {
     Cart cart = getCartByUsername(username);
-    Book book =
-        bookService
-            .getBookById(bookId);
+    Book book = bookService.getBookById(bookId);
 
-    Optional<CartItem> existingItem =
-        cart.getItems().stream().filter(item -> item.getBook().getId().equals(bookId)).findFirst();
+    Optional<CartItem> existingItem = getCartItemByBookId(bookId);
 
     if (existingItem.isPresent()) {
       CartItem item = existingItem.get();
@@ -68,5 +65,9 @@ public class CartService {
 
   public void removeFromCart(List<Long> bookIds) {
     cartItemRepo.deleteByBookIdIn(bookIds);
+  }
+
+  public Optional<CartItem> getCartItemByBookId(Long bookId) {
+    return cartItemRepo.findById(bookId);
   }
 }

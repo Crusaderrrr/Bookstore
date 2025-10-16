@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import com.bookstore.app.model.UserVerification;
 import com.bookstore.app.repo.UserVerificationRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +26,7 @@ public class VerificationServiceTests {
     verification.setEmail("test@test.com");
     verification.setVerificationCode("123456");
 
-    when(verificationRepository.findByEmail("test@test.com")).thenReturn(verification);
+    when(verificationRepository.findByEmail("test@test.com")).thenReturn(Optional.of(verification));
 
     assertTrue(verificationService.verifyCode("test@test.com", "123456"));
 

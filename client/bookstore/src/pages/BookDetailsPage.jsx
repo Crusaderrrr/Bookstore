@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap";
 import "../style/bookStyle.css";
 import { AppContext } from "../context/AppContext";
+import default_book_cover from "../assets/book_cover.jpg";
 
 export default function BookDetailsPage() {
   const { isLoggedIn } = useContext(AppContext);
@@ -21,8 +22,6 @@ export default function BookDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [isLiked, setIsLiked] = useState(false);
   const [buttonText, setButtonText] = useState("Add to Cart");
-  const default_book_cover =
-    "https://res.cloudinary.com/dupcshdti/image/upload/v1759743713/book_cover_rllhzg.jpg";
   const min = 1;
   const max = 30;
 
@@ -47,26 +46,22 @@ export default function BookDetailsPage() {
   }, []);
 
   const handleToggleLike = async () => {
-    if (isLiked) {
-      try {
+    try {
+      if (isLiked) {
         const response = await axiosInstance.post("/likes/remove", {
           bookId: id,
         });
         if (response.status === 200) {
           setIsLiked(false);
         }
-      } catch (err) {
-        console.error("Error fetching book details:", err);
-      }
-    } else {
-      try {
+      } else {
         const response = await axiosInstance.post("/likes/add", { bookId: id });
         if (response.status === 200) {
           setIsLiked(true);
         }
-      } catch (err) {
-        console.error("Error fetching book details:", err);
       }
+    } catch (err) {
+      console.error(err);
     }
   };
 

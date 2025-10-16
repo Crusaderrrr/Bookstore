@@ -12,7 +12,7 @@ public class VerificationService {
 
   @Transactional
   public boolean verifyCode(String email, String code) {
-    UserVerification userVerification = verificationRepository.findByEmail(email);
+    UserVerification userVerification = verificationRepository.findByEmail(email).get();
     if (userVerification != null && userVerification.getVerificationCode().equals(code)) {
       this.deleteVerification(email);
       return true;

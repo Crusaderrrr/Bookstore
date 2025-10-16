@@ -40,7 +40,8 @@ public class User {
 
   private String password;
 
-  private String roles;
+  @Column(nullable = false)
+  private String roles = "ROLE_USER";
 
   private boolean active;
 

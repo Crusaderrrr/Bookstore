@@ -5,6 +5,7 @@ import com.bookstore.app.model.User;
 import com.bookstore.app.repo.ImageRepo;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,14 +68,20 @@ public class ImageService {
 
   @Transactional
   public void deleteImagesByUserIds(List<Integer> userIds) throws IOException {
+    List<Integer> failedUserIds = new ArrayList<>();
+
     userIds.forEach(
         userId -> {
           try {
             deleteImageByUserId(userId);
           } catch (IOException e) {
-            throw new RuntimeException(e);
+            failedUserIds.add(userId);
           }
         });
+
+    if (!failedUserIds.isEmpty()) {
+      throw new IOException("Failed to delete images for user ids: " + failedUserIds);
+    }
   }
 
   public void deleteImageByUserId(int userId) throws IOException {
