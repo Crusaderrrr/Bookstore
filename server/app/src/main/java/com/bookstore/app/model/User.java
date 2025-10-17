@@ -26,38 +26,35 @@ import lombok.ToString;
 @ToString(exclude = {"image", "cart"})
 public class User {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
-  @NotEmpty(message = "Username is required")
-  @Column(unique = true)
-  private String username;
+    @NotEmpty(message = "Username is required")
+    @Column(unique = true)
+    private String username;
 
-  @Email(message = "Please provide a valid email")
-  @Column(unique = true)
-  private String email;
+    @Email(message = "Please provide a valid email")
+    @Column(unique = true)
+    private String email;
 
-  private String password;
+    private String password;
 
-  @Column(nullable = false)
-  private String roles = "ROLE_USER";
+    @Column(nullable = false)
+    private String roles = "ROLE_USER";
 
-  private boolean active;
+    private boolean active;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-  @JsonManagedReference
-  private Image image;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    @JsonManagedReference
+    private Image image;
 
-  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
-  @JsonManagedReference
-  private Cart cart;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    @JsonManagedReference
+    private Cart cart;
 
-  @OneToOne(
-      mappedBy = "user",
-      cascade = CascadeType.PERSIST,
-      fetch = FetchType.LAZY,
-      optional = true)
-  @JsonIgnore
-  private Author author;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY,
+            optional = true)
+    @JsonIgnore
+    private Author author;
 }

@@ -15,45 +15,45 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class RefreshController {
-  private final RefreshService refreshService;
-  private final JWTService jwtService;
+    private final RefreshService refreshService;
+    private final JWTService jwtService;
 
-  public RefreshController(RefreshService refreshService, JWTService jwtService) {
-    this.refreshService = refreshService;
-    this.jwtService = jwtService;
-  }
+    public RefreshController(RefreshService refreshService, JWTService jwtService) {
+        this.refreshService = refreshService;
+        this.jwtService = jwtService;
+    }
 
-  @PostMapping("/refresh_token")
-  public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    String refreshToken = null;
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if ("refreshToken".equals(cookie.getName())) {
-          refreshToken = cookie.getValue();
-          break;
+    @PostMapping("/refresh_token")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String refreshToken = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
         }
-      }
+
+        if (refreshToken == null) {
+            throw new EntityNotFoundException("Refresh token cookie not found");
+        }
+
+        try {
+            RefreshToken token = refreshService.getRefreshToken(refreshToken);
+            refreshService.verifyExpiration(token);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+        User user = refreshService.getUserFromRefreshToken(refreshToken);
+        String newAccessToken = jwtService.generateToken(user);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
+        response.put("refreshToken", refreshToken);
+
+        return ResponseEntity.ok(response);
     }
-
-    if (refreshToken == null) {
-      throw new EntityNotFoundException("Refresh token cookie not found");
-    }
-
-    try {
-      RefreshToken token = refreshService.getRefreshToken(refreshToken);
-      refreshService.verifyExpiration(token);
-    } catch (Exception e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
-    }
-
-    User user = refreshService.getUserFromRefreshToken(refreshToken);
-    String newAccessToken = jwtService.generateToken(user);
-
-    Map<String, String> response = new HashMap<>();
-    response.put("accessToken", newAccessToken);
-    response.put("refreshToken", refreshToken);
-
-    return ResponseEntity.ok(response);
-  }
 }

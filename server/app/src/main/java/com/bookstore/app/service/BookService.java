@@ -14,58 +14,57 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class BookService {
-  private final BookRepo bookRepo;
-  private final BookImageService bookImageService;
-  private final CloudinaryService cloudinaryService;
+    private final BookRepo bookRepo;
+    private final BookImageService bookImageService;
+    private final CloudinaryService cloudinaryService;
 
-  public BookService(
-      BookRepo bookRepo, BookImageService bookImageService, CloudinaryService cloudinaryService) {
-    this.bookRepo = bookRepo;
-    this.bookImageService = bookImageService;
-    this.cloudinaryService = cloudinaryService;
-  }
-
-  public Book getBookById(Long id) throws EntityNotFoundException {
-    return bookRepo
-        .findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
-  }
-
-  public Iterable<Book> getAllBooks() {
-    return bookRepo.findAll();
-  }
-
-  @Transactional
-  public void saveBook(Book book, Author author, BookImage bookImage) {
-    bookImage.setBook(book);
-    book.setBookImage(bookImage);
-    book.setAuthor(author);
-    book.setDatePosted(LocalDate.now());
-    bookRepo.save(book);
-  }
-
-  public List<Book> getBooksByAuthor(Author author) {
-    return bookRepo.findByAuthor(author);
-  }
-
-  public List<Book> findBooksByTitle(String keyword) {
-    return bookRepo.findByTitleContainingIgnoreCase(keyword);
-  }
-
-  public List<Book> findBookByTitleAndGenre(String title, Genre genre) {
-    return bookRepo.findByTitleContainingIgnoreCaseAndGenre(title, genre);
-  }
-
-  @Transactional
-  public void deleteBooksById(List<Long> bookIds) throws IOException {
-    List<Book> books = bookRepo.findAllById(bookIds);
-
-    for (Book book : books) {
-      if (book.getBookImage() != null) {
-        cloudinaryService.deleteFile(book.getBookImage().getPublicId());
-      }
+    public BookService(BookRepo bookRepo, BookImageService bookImageService,
+            CloudinaryService cloudinaryService) {
+        this.bookRepo = bookRepo;
+        this.bookImageService = bookImageService;
+        this.cloudinaryService = cloudinaryService;
     }
-    bookRepo.deleteAll(books);
-    bookRepo.flush();
-  }
+
+    public Book getBookById(Long id) throws EntityNotFoundException {
+        return bookRepo.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
+    }
+
+    public Iterable<Book> getAllBooks() {
+        return bookRepo.findAll();
+    }
+
+    @Transactional
+    public void saveBook(Book book, Author author, BookImage bookImage) {
+        bookImage.setBook(book);
+        book.setBookImage(bookImage);
+        book.setAuthor(author);
+        book.setDatePosted(LocalDate.now());
+        bookRepo.save(book);
+    }
+
+    public List<Book> getBooksByAuthor(Author author) {
+        return bookRepo.findByAuthor(author);
+    }
+
+    public List<Book> findBooksByTitle(String keyword) {
+        return bookRepo.findByTitleContainingIgnoreCase(keyword);
+    }
+
+    public List<Book> findBookByTitleAndGenre(String title, Genre genre) {
+        return bookRepo.findByTitleContainingIgnoreCaseAndGenre(title, genre);
+    }
+
+    @Transactional
+    public void deleteBooksById(List<Long> bookIds) throws IOException {
+        List<Book> books = bookRepo.findAllById(bookIds);
+
+        for (Book book : books) {
+            if (book.getBookImage() != null) {
+                cloudinaryService.deleteFile(book.getBookImage().getPublicId());
+            }
+        }
+        bookRepo.deleteAll(books);
+        bookRepo.flush();
+    }
 }

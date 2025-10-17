@@ -27,43 +27,41 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @Table(name = "books")
 public class Book {
-  @Id @GeneratedValue private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-  @NotBlank(message = "Title is required")
-  private String title;
+    @NotBlank(message = "Title is required")
+    private String title;
 
-  @NotBlank(message = "Description is required")
-  private String description;
+    @NotBlank(message = "Description is required")
+    private String description;
 
-  @DecimalMin(value = "0.99", message = "Price must be greater than or equal to 0.99")
-  private double price;
+    @DecimalMin(value = "0.99", message = "Price must be greater than or equal to 0.99")
+    private double price;
 
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate datePosted;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate datePosted;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "author_id")
-  @JsonBackReference
-  private Author author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    @JsonBackReference
+    private Author author;
 
-  @JsonProperty("authorInfo")
-  public Map<String, String> getAuthorInfo() {
-    Map<String, String> info = new HashMap<>();
-    info.put("name", author.getName());
-    info.put("surname", author.getSurname());
-    return info;
-  }
+    @JsonProperty("authorInfo")
+    public Map<String, String> getAuthorInfo() {
+        Map<String, String> info = new HashMap<>();
+        info.put("name", author.getName());
+        info.put("surname", author.getSurname());
+        return info;
+    }
 
-  @OneToOne(
-      mappedBy = "book",
-      cascade = CascadeType.ALL,
-      fetch = FetchType.LAZY,
-      optional = true,
-      orphanRemoval = true)
-  @JsonManagedReference
-  private BookImage bookImage;
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true,
+            orphanRemoval = true)
+    @JsonManagedReference
+    private BookImage bookImage;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Genre genre;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Genre genre;
 }

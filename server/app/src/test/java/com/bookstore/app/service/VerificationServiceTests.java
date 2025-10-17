@@ -16,21 +16,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class VerificationServiceTests {
-  @Mock private UserVerificationRepository verificationRepository;
+    @Mock
+    private UserVerificationRepository verificationRepository;
 
-  @Spy @InjectMocks private VerificationService verificationService;
+    @Spy
+    @InjectMocks
+    private VerificationService verificationService;
 
-  @Test
-  public void testVerifyCode() {
-    UserVerification verification = new UserVerification();
-    verification.setEmail("test@test.com");
-    verification.setVerificationCode("123456");
+    @Test
+    public void testVerifyCode() {
+        UserVerification verification = new UserVerification();
+        verification.setEmail("test@test.com");
+        verification.setVerificationCode("123456");
 
-    when(verificationRepository.findByEmail("test@test.com")).thenReturn(Optional.of(verification));
+        when(verificationRepository.findByEmail("test@test.com"))
+                .thenReturn(Optional.of(verification));
 
-    assertTrue(verificationService.verifyCode("test@test.com", "123456"));
+        assertTrue(verificationService.verifyCode("test@test.com", "123456"));
 
-    verify(verificationService).deleteVerification("test@test.com");
-    verify(verificationService).verifyCode("test@test.com", "123456");
-  }
+        verify(verificationService).deleteVerification("test@test.com");
+        verify(verificationService).verifyCode("test@test.com", "123456");
+    }
 }

@@ -11,16 +11,17 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class CloudinaryService {
 
-  @Autowired private Cloudinary cloudinary;
+    @Autowired
+    private Cloudinary cloudinary;
 
-  public Map uploadFile(MultipartFile file) throws IOException {
-    byte[] fileBytes = file.getBytes();
-    Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.emptyMap());
-    return uploadResult;
-  }
+    public Map uploadFile(MultipartFile file) throws IOException {
+        byte[] fileBytes = file.getBytes();
+        Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.emptyMap());
+        return uploadResult;
+    }
 
-  public Map deleteFile(String publicId) throws IOException {
-    Map options = ObjectUtils.asMap("invalidate", true);
-    return cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-  }
+    public Map deleteFile(String publicId) throws IOException {
+        Map options = ObjectUtils.asMap("invalidate", true);
+        return cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+    }
 }

@@ -25,72 +25,64 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/moderation")
 public class ModerationController {
-  private final ModerationService moderationService;
-  private final CloudinaryService cloudinaryService;
-  private final AuthorService authorService;
+    private final ModerationService moderationService;
+    private final CloudinaryService cloudinaryService;
+    private final AuthorService authorService;
 
-  public ModerationController(
-      ModerationService moderationService,
-      CloudinaryService cloudinaryService,
-      AuthorService authorService) {
-    this.moderationService = moderationService;
-    this.cloudinaryService = cloudinaryService;
-    this.authorService = authorService;
-  }
+    public ModerationController(ModerationService moderationService,
+            CloudinaryService cloudinaryService, AuthorService authorService) {
+        this.moderationService = moderationService;
+        this.cloudinaryService = cloudinaryService;
+        this.authorService = authorService;
+    }
 
-  @GetMapping("/requests/all")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<List<ModerationRequestDTO>> getAllModerationRequests() {
-    List<ModerationRequestDTO> requests =
-        moderationService.findAll().stream()
-            .map(ModerationRequest::toDTO)
-            .collect(Collectors.toList());
+    @GetMapping("/requests/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ModerationRequestDTO>> getAllModerationRequests() {
+        List<ModerationRequestDTO> requests = moderationService.findAll().stream()
+                .map(ModerationRequest::toDTO).collect(Collectors.toList());
 
-    return ResponseEntity.ok(requests);
-  }
+        return ResponseEntity.ok(requests);
+    }
 
-  @GetMapping("/requests/my")
-  public ResponseEntity<List<ModerationRequestDTO>> getMyModerationRequests(Principal principal) {
-    List<ModerationRequestDTO> requests =
-        moderationService.finAllRequestsByUsername(principal.getName());
-    return ResponseEntity.ok(requests);
-  }
+    @GetMapping("/requests/my")
+    public ResponseEntity<List<ModerationRequestDTO>> getMyModerationRequests(Principal principal) {
+        List<ModerationRequestDTO> requests =
+                moderationService.finAllRequestsByUsername(principal.getName());
+        return ResponseEntity.ok(requests);
+    }
 
-  @PostMapping("/requests/new")
-  @PreAuthorize("hasRole('AUTHOR')")
-  public ResponseEntity<String> createModerationRequest(
-      @RequestParam MultipartFile image,
-      @RequestParam String title,
-      @RequestParam String description,
-      @RequestParam double price,
-      @RequestParam String genre,
-      Principal principal)
-      throws IOException {
-    Map imageData = cloudinaryService.uploadFile(image);
-    ModerationRequest request = new ModerationRequest();
-    request.setTitle(title);
-    request.setDescription(description);
-    request.setPrice(price);
-    request.setGenre(Genre.valueOf(genre));
-    request.setAuthor(authorService.getAuthorByUsername(principal.getName()));
-    request.setImagePublicId((String) imageData.get("public_id"));
-    request.setImageUrl((String) imageData.get("secure_url"));
-    moderationService.saveModerationRequest(request);
+    @PostMapping("/requests/new")
+    @PreAuthorize("hasRole('AUTHOR')")
+    public ResponseEntity<String> createModerationRequest(@RequestParam MultipartFile image,
+            @RequestParam String title, @RequestParam String description,
+            @RequestParam double price, @RequestParam String genre, Principal principal)
+            throws IOException {
+        Map imageData = cloudinaryService.uploadFile(image);
+        ModerationRequest request = new ModerationRequest();
+        request.setTitle(title);
+        request.setDescription(description);
+        request.setPrice(price);
+        request.setGenre(Genre.valueOf(genre));
+        request.setAuthor(authorService.getAuthorByUsername(principal.getName()));
+        request.setImagePublicId((String) imageData.get("public_id"));
+        request.setImageUrl((String) imageData.get("secure_url"));
+        moderationService.saveModerationRequest(request);
 
-    return ResponseEntity.ok("Moderation request created");
-  }
+        return ResponseEntity.ok("Moderation request created");
+    }
 
-  @PostMapping("/requests/{id}/approve")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<String> approveModerationRequest(@PathVariable Long id) {
-    moderationService.approveModerationRequest(id);
-    return ResponseEntity.ok("Moderation request approved");
-  }
+    @PostMapping("/requests/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> approveModerationRequest(@PathVariable Long id) {
+        moderationService.approveModerationRequest(id);
+        return ResponseEntity.ok("Moderation request approved");
+    }
 
-  @PostMapping("/requests/{id}/reject")
-  public ResponseEntity<String> rejectModerationRequest(
-      @PathVariable Long id, @RequestBody String reason) {
-    moderationService.rejectModerationRequest(id, reason);
-    return ResponseEntity.ok("Moderation request rejected");
-  }
+    @PostMapping("/requests/{id}/reject")
+    public ResponseEntity<String> rejectModerationRequest(@PathVariable Long id,
+            @RequestBody String reason) {
+        moderationService.rejectModerationRequest(id, reason);
+        return ResponseEntity.ok("Moderation request rejected");
+    }
 }

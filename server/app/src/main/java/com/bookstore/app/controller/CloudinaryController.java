@@ -13,19 +13,19 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/cloudinary")
 public class CloudinaryController {
 
-  private final CloudinaryService cloudinaryService;
+    private final CloudinaryService cloudinaryService;
 
-  public CloudinaryController(CloudinaryService cloudinaryService) {
-    this.cloudinaryService = cloudinaryService;
-  }
+    public CloudinaryController(CloudinaryService cloudinaryService) {
+        this.cloudinaryService = cloudinaryService;
+    }
 
-  @PostMapping("/upload")
-  public Map uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
-    return cloudinaryService.uploadFile(file);
-  }
+    @PostMapping("/upload")
+    public Map uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+        return cloudinaryService.uploadFile(file);
+    }
 
-  @PostMapping("/delete")
-  public Map deleteFile(@RequestParam("publicId") String publicId) throws IOException {
-    return cloudinaryService.deleteFile(publicId);
-  }
+    @PostMapping("/delete")
+    public Map deleteFile(@RequestParam("publicId") String publicId) throws IOException {
+        return cloudinaryService.deleteFile(publicId);
+    }
 }

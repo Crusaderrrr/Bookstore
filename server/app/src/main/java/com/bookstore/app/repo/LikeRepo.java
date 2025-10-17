@@ -5,5 +5,5 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikeRepo extends JpaRepository<Like, Long> {
-  Optional<Like> findLikeByBookId(long bookId);
+    Optional<Like> findLikeByBookId(long bookId);
 }

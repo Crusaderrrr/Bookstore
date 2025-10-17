@@ -20,15 +20,15 @@ import lombok.ToString;
 @ToString(exclude = "user")
 @Table(name = "images")
 public class Image {
-  @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
 
-  private String publicId;
-  private String url;
+    private String publicId;
+    private String url;
 
-  @OneToOne
-  @JoinColumn(name = "user_id")
-  @JsonBackReference
-  private User user;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
+    private User user;
 }

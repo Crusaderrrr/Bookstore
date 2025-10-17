@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/authors")
 public class AuthorController {
 
-  private final AuthorService authorService;
+    private final AuthorService authorService;
 
-  public AuthorController(AuthorService authorService) {
-    this.authorService = authorService;
-  }
+    public AuthorController(AuthorService authorService) {
+        this.authorService = authorService;
+    }
 
-  @PostMapping("/new")
-  public ResponseEntity<String> createAuthor(
-      @Valid @RequestBody Author author, Principal principal) {
-    authorService.createAuthor(author, principal.getName());
-    return ResponseEntity.ok("Author created");
-  }
+    @PostMapping("/new")
+    public ResponseEntity<String> createAuthor(@Valid @RequestBody Author author,
+            Principal principal) {
+        authorService.createAuthor(author, principal.getName());
+        return ResponseEntity.ok("Author created");
+    }
 }

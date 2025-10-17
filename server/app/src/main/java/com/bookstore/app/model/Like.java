@@ -13,13 +13,15 @@ import lombok.Data;
 @Data
 @Table(name = "likes", uniqueConstraints = @UniqueConstraint(columnNames = {"book_id", "user_id"}))
 public class Like {
-  @Id @GeneratedValue private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "book_id")
-  private Book book;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "book_id")
+    private Book book;
 
-  @ManyToOne(optional = false)
-  @JoinColumn(name = "user_id")
-  private User user;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

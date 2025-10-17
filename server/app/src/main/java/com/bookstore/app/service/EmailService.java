@@ -8,14 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-  @Autowired private JavaMailSender mailSender;
+    @Autowired
+    private JavaMailSender mailSender;
 
-  public void sendVerificationEmail(String toEmail, String verificationCode) {
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setFrom("bulashnikita@gmail.com");
-    message.setTo(toEmail);
-    message.setSubject("Email Verification Code");
-    message.setText("Your verification code is: " + verificationCode);
-    mailSender.send(message);
-  }
+    public void sendVerificationEmail(String toEmail, String verificationCode) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("bulashnikita@gmail.com");
+        message.setTo(toEmail);
+        message.setSubject("Email Verification Code");
+        message.setText("Your verification code is: " + verificationCode);
+        mailSender.send(message);
+    }
 }

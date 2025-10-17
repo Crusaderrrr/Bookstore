@@ -13,14 +13,17 @@ import lombok.Data;
 @Data
 @Table(name = "cart_item")
 public class CartItem {
-  @Id @GeneratedValue private Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-  @ManyToOne 
-  @JoinColumn(name = "cart_id")
-  @JsonBackReference
-  private Cart cart;
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    @JsonBackReference
+    private Cart cart;
 
-  @ManyToOne private Book book;
+    @ManyToOne
+    private Book book;
 
-  private int quantity;
+    private int quantity;
 }

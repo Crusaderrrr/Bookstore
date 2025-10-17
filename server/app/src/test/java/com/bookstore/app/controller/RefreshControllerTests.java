@@ -25,51 +25,52 @@ import org.springframework.web.server.ResponseStatusException;
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class RefreshControllerTests {
-  @Autowired MockMvc mockMvc;
-  @Autowired ObjectMapper objectMapper;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    ObjectMapper objectMapper;
 
-  @MockitoBean RefreshService refreshService;
-  @MockitoBean JWTService jwtService;
+    @MockitoBean
+    RefreshService refreshService;
+    @MockitoBean
+    JWTService jwtService;
 
-  @Test
-  public void refreshTokenReturnsNewAccessTokenAndRefreshToken() throws Exception {
-    String refreshToken = "validRefreshToken";
-    String newAccessToken = "newAccessToken";
+    @Test
+    public void refreshTokenReturnsNewAccessTokenAndRefreshToken() throws Exception {
+        String refreshToken = "validRefreshToken";
+        String newAccessToken = "newAccessToken";
 
-    RefreshToken token = new RefreshToken();
-    token.setToken(refreshToken);
+        RefreshToken token = new RefreshToken();
+        token.setToken(refreshToken);
 
-    User user = new User();
-    user.setUsername("testuser");
+        User user = new User();
+        user.setUsername("testuser");
 
-    Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 
-    when(refreshService.getRefreshToken(refreshToken)).thenReturn(token);
-    when(refreshService.verifyExpiration(token)).thenReturn(token);
-    when(jwtService.generateToken(user)).thenReturn(newAccessToken);
-    when(refreshService.getUserFromRefreshToken(refreshToken)).thenReturn(user);
+        when(refreshService.getRefreshToken(refreshToken)).thenReturn(token);
+        when(refreshService.verifyExpiration(token)).thenReturn(token);
+        when(jwtService.generateToken(user)).thenReturn(newAccessToken);
+        when(refreshService.getUserFromRefreshToken(refreshToken)).thenReturn(user);
 
-    mockMvc
-        .perform(post("/refresh_token").cookie(refreshCookie))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.accessToken").value(newAccessToken))
-        .andExpect(jsonPath("$.refreshToken").value(refreshToken));
-  }
+        mockMvc.perform(post("/refresh_token").cookie(refreshCookie)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value(newAccessToken))
+                .andExpect(jsonPath("$.refreshToken").value(refreshToken));
+    }
 
-  @Test
-  public void refreshTokenExpiredTokenThrowsException() throws Exception {
-    String refreshToken = "validRefreshToken";
+    @Test
+    public void refreshTokenExpiredTokenThrowsException() throws Exception {
+        String refreshToken = "validRefreshToken";
 
-    RefreshToken token = new RefreshToken();
-    token.setToken(refreshToken);
+        RefreshToken token = new RefreshToken();
+        token.setToken(refreshToken);
 
-    Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
 
-    when(refreshService.getRefreshToken(refreshToken)).thenReturn(token);
-    when(refreshService.verifyExpiration(token)).thenThrow(ResponseStatusException.class);
+        when(refreshService.getRefreshToken(refreshToken)).thenReturn(token);
+        when(refreshService.verifyExpiration(token)).thenThrow(ResponseStatusException.class);
 
-    mockMvc
-        .perform(post("/refresh_token").cookie(refreshCookie))
-        .andExpect(status().is4xxClientError());
-  }
+        mockMvc.perform(post("/refresh_token").cookie(refreshCookie))
+                .andExpect(status().is4xxClientError());
+    }
 }

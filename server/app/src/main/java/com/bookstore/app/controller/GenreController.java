@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/genres")
 public class GenreController {
 
-  @GetMapping
-  public List<String> getAllGenres() {
-    return Arrays.stream(Genre.values()).map(Enum::name).collect(Collectors.toList());
-  }
+    @GetMapping
+    public List<String> getAllGenres() {
+        return Arrays.stream(Genre.values()).map(Enum::name).collect(Collectors.toList());
+    }
 }

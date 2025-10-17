@@ -8,23 +8,24 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class VerificationService {
-  @Autowired private UserVerificationRepository verificationRepository;
+    @Autowired
+    private UserVerificationRepository verificationRepository;
 
-  @Transactional
-  public boolean verifyCode(String email, String code) {
-    UserVerification userVerification = verificationRepository.findByEmail(email).get();
-    if (userVerification != null && userVerification.getVerificationCode().equals(code)) {
-      this.deleteVerification(email);
-      return true;
+    @Transactional
+    public boolean verifyCode(String email, String code) {
+        UserVerification userVerification = verificationRepository.findByEmail(email).get();
+        if (userVerification != null && userVerification.getVerificationCode().equals(code)) {
+            this.deleteVerification(email);
+            return true;
+        }
+        return false;
     }
-    return false;
-  }
 
-  public void saveVerification(UserVerification verification) {
-    verificationRepository.save(verification);
-  }
+    public void saveVerification(UserVerification verification) {
+        verificationRepository.save(verification);
+    }
 
-  public void deleteVerification(String email) {
-    verificationRepository.deleteByEmail(email);
-  }
+    public void deleteVerification(String email) {
+        verificationRepository.deleteByEmail(email);
+    }
 }

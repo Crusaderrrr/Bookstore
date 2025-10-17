@@ -14,53 +14,56 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class RefreshService {
-  @Value("${app.jwtRefreshExpirationMs}")
-  private long refreshTokenDurationMs;
+    @Value("${app.jwtRefreshExpirationMs}")
+    private long refreshTokenDurationMs;
 
-  @Autowired private RefreshTokenRepository refreshTokenRepository;
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
-  @Autowired private UserService userService;
+    @Autowired
+    private UserService userService;
 
-  public RefreshService() { }
+    public RefreshService() { }
 
-  @Transactional
-  public RefreshToken createRefreshToken(String username) {
-    User user = userService.findByUsername(username);
-    if (user == null) {
-      throw new ResponseStatusException(
-          HttpStatus.NOT_FOUND, "User not found with name " + username);
+    @Transactional
+    public RefreshToken createRefreshToken(String username) {
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "User not found with name " + username);
+        }
+
+        refreshTokenRepository.deleteByUser(user);
+        refreshTokenRepository.flush();
+
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
+        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+        refreshToken.setToken(UUID.randomUUID().toString());
+
+        return refreshTokenRepository.save(refreshToken);
     }
 
-    refreshTokenRepository.deleteByUser(user);
-    refreshTokenRepository.flush();
-
-    RefreshToken refreshToken = new RefreshToken();
-    refreshToken.setUser(user);
-    refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-    refreshToken.setToken(UUID.randomUUID().toString());
-
-    return refreshTokenRepository.save(refreshToken);
-  }
-
-  public RefreshToken verifyExpiration(RefreshToken token) {
-    if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-      refreshTokenRepository.delete(token);
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please make a new signin request");
+    public RefreshToken verifyExpiration(RefreshToken token) {
+        if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            refreshTokenRepository.delete(token);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Please make a new signin request");
+        }
+        return token;
     }
-    return token;
-  }
 
-  public RefreshToken getRefreshToken(String token) {
-    return refreshTokenRepository.findByToken(token).orElse(null);
-  }
+    public RefreshToken getRefreshToken(String token) {
+        return refreshTokenRepository.findByToken(token).orElse(null);
+    }
 
-  public User getUserFromRefreshToken(String token) {
-    return refreshTokenRepository.findByToken(token).get().getUser();
-  }
+    public User getUserFromRefreshToken(String token) {
+        return refreshTokenRepository.findByToken(token).get().getUser();
+    }
 
-  @Transactional
-  public void delete(String username) {
-    User user = userService.findByUsername(username);
-    refreshTokenRepository.deleteByUser(user);
-  }
+    @Transactional
+    public void delete(String username) {
+        User user = userService.findByUsername(username);
+        refreshTokenRepository.deleteByUser(user);
+    }
 }

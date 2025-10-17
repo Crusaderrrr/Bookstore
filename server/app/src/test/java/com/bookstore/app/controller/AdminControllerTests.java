@@ -30,34 +30,34 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class AdminControllerTests {
-  @Autowired MockMvc mockMvc;
-  @Autowired ObjectMapper objectMapper;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    ObjectMapper objectMapper;
 
-  @MockitoBean UserService userService;
-  @MockitoBean ImageService imageService;
+    @MockitoBean
+    UserService userService;
+    @MockitoBean
+    ImageService imageService;
 
-  @Test
-  public void deleteUserWithImagesShouldReturnOk() throws Exception {
-    List<Integer> userIds = Arrays.asList(1, 2, 3);
+    @Test
+    public void deleteUserWithImagesShouldReturnOk() throws Exception {
+        List<Integer> userIds = Arrays.asList(1, 2, 3);
 
-    when(imageService.findImageByUserId(1)).thenReturn(new Image());
-    when(imageService.findImageByUserId(2)).thenReturn(null);
-    when(imageService.findImageByUserId(3)).thenReturn(null);
+        when(imageService.findImageByUserId(1)).thenReturn(new Image());
+        when(imageService.findImageByUserId(2)).thenReturn(null);
+        when(imageService.findImageByUserId(3)).thenReturn(null);
 
-    doNothing().when(imageService).deleteImageByUserId(1);
-    doNothing().when(userService).deleteUsersById(userIds);
+        doNothing().when(imageService).deleteImageByUserId(1);
+        doNothing().when(userService).deleteUsersById(userIds);
 
-    mockMvc
-        .perform(
-            post("/users/delete")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(userIds.toString()))
-        .andExpect(status().isOk())
-        .andExpect(content().string("User deleted"));
+        mockMvc.perform(post("/users/delete").contentType(MediaType.APPLICATION_JSON)
+                .content(userIds.toString())).andExpect(status().isOk())
+                .andExpect(content().string("User deleted"));
 
-    verify(imageService).deleteImageByUserId(1);
-    verify(imageService, never()).deleteImageByUserId(2);
-    verify(imageService, never()).deleteImageByUserId(3);
-    verify(userService).deleteUsersById(userIds);
-  }
+        verify(imageService).deleteImageByUserId(1);
+        verify(imageService, never()).deleteImageByUserId(2);
+        verify(imageService, never()).deleteImageByUserId(3);
+        verify(userService).deleteUsersById(userIds);
+    }
 }
