@@ -55,7 +55,7 @@ export default function ProfileInfo({
     };
 
     try {
-      const response = await axiosInstance.post("/authors/new", authorData);
+      const response = await axiosInstance.post("/authors", authorData);
       if (response.status === 200) {
         setAlertType("success");
         setAlertMessage("You are an author now");

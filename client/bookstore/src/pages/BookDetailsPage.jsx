@@ -72,7 +72,7 @@ export default function BookDetailsPage() {
         formData.append("bookId", id);
         formData.append("quantity", quantity);
         try {
-            const response = await axiosInstance.post("/cart/add", formData);
+            const response = await axiosInstance.post("/cart", formData);
             if (response.status === 200) {
                 setButtonText("Added to Cart");
             }

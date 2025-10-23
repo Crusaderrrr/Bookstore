@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,10 +26,11 @@ public class AdminController {
         this.imageService = imageService;
     }
 
-    @PostMapping("/delete")
-    public ResponseEntity<String> deleteUser(@RequestBody List<Integer> userIds)
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUsers(@RequestBody List<Integer> userIds)
             throws IOException {
         for (Integer userId : userIds) {
+            System.out.println(userId);
             Image image = imageService.findImageByUserId(userId);
             if (image != null) {
                 imageService.deleteImageByUserId(userId);
@@ -36,26 +39,25 @@ public class AdminController {
         userService.deleteUsersById(userIds);
         return ResponseEntity.ok("User deleted");
     }
-
-    @PostMapping("/make_admin")
+    @PatchMapping("/make_admin")
     public ResponseEntity<String> makeAdmin(@RequestBody List<Integer> userIds) {
         userService.makeAdmin(userIds);
         return ResponseEntity.ok("User made admin");
     }
 
-    @PostMapping("/remove_admin")
+    @PatchMapping("/remove_admin")
     public ResponseEntity<String> removeAdmin(@RequestBody List<Integer> userIds) {
         userService.removeAdmin(userIds);
         return ResponseEntity.ok("Admin rights removed");
     }
 
-    @PostMapping("/block")
+    @PatchMapping("/block")
     public ResponseEntity<String> blockUsers(@RequestBody List<Integer> userIds) {
         userService.blockUsers(userIds);
         return ResponseEntity.ok("User blocked");
     }
 
-    @PostMapping("/unblock")
+    @PatchMapping("/unblock")
     public ResponseEntity<String> unblockUsers(@RequestBody List<Integer> userIds) {
         userService.unblockUsers(userIds);
         return ResponseEntity.ok("User unblocked");

@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -85,14 +84,12 @@ public class UserController {
         return ResponseEntity.ok(responseBody);
     }
 
-    @GetMapping("/all")
-    @PreAuthorize("isAuthenticated()")
+    @GetMapping
     public Iterable<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @GetMapping("/self")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> getCurrentUser(Principal principal) {
         User user = userService.findByUsername(principal.getName());
         Map<String, Object> response = new HashMap<>();
@@ -107,8 +104,8 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/new")
-    public ResponseEntity<?> newUser(@Valid @RequestBody UserDTO user, BindingResult result,
+    @PostMapping
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO user, BindingResult result,
             HttpServletResponse response) {
         if (result.hasErrors()) {
             List<String> errors = result.getAllErrors().stream().map(ObjectError::getDefaultMessage)

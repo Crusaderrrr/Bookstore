@@ -32,7 +32,7 @@ function SignupPage() {
     setAlertType("");
 
     try {
-      const response = await axiosInstance.post("/users/new", {
+      const response = await axiosInstance.post("/users", {
         username,
         password,
         email,

@@ -6,6 +6,7 @@ import com.bookstore.app.service.CartService;
 import java.security.Principal;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<String> addToCart(@RequestParam Long bookId,
             @RequestParam(defaultValue = "1") int quantity, Principal principal) {
 
@@ -32,14 +33,14 @@ public class CartController {
         return ResponseEntity.ok("Book added to cart");
     }
 
-    @GetMapping("/items")
+    @GetMapping
     public ResponseEntity<List<CartItem>> getCartItems(Principal principal) {
         List<CartItem> items = cartService.getCartByUsername(principal.getName()).getItems();
 
         return ResponseEntity.ok(items);
     }
 
-    @PostMapping("/remove")
+    @DeleteMapping
     public ResponseEntity<String> removeBooksFromCart(@RequestBody List<Long> bookIds) {
         cartService.removeFromCart(bookIds);
 

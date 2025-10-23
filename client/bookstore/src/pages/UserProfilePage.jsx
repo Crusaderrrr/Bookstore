@@ -39,8 +39,8 @@ export default function UserProfilePage() {
 
     async function fetchRequests() {
       try {
-        const response = await axiosInstance.get("/moderation/requests/my");
-        setRequests(response.data);
+        const response = await axiosInstance.get("/moderation");
+        setRequests(response.data || []);
       } catch (err) {
         console.error(err);
       }

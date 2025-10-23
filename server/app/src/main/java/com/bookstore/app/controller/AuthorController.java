@@ -20,7 +20,7 @@ public class AuthorController {
         this.authorService = authorService;
     }
 
-    @PostMapping("/new")
+    @PostMapping
     public ResponseEntity<String> createAuthor(@Valid @RequestBody Author author,
             Principal principal) {
         authorService.createAuthor(author, principal.getName());

@@ -1,18 +1,16 @@
 package com.bookstore.app.controller;
 
-import com.bookstore.app.model.Author;
 import com.bookstore.app.model.Book;
 import com.bookstore.app.model.Genre;
 import com.bookstore.app.service.AuthorService;
 import com.bookstore.app.service.BookService;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +27,7 @@ public class BookController {
         this.authorService = authorService;
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public Iterable<Book> getAllBooks() {
         return bookService.getAllBooks();
     }
@@ -52,17 +50,7 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    @PostMapping("/add-books")
-    public ResponseEntity<String> addBooks(@RequestBody List<Book> books, Principal principal)
-            throws IOException {
-        Author author = authorService.getAuthorByUsername(principal.getName());
-        for (Book book : books) {
-            bookService.saveBook(book, author, null);
-        }
-        return ResponseEntity.ok("Books added");
-    }
-
-    @PostMapping("/delete")
+    @DeleteMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR')")
     public ResponseEntity<String> deleteBooks(@RequestBody List<Long> bookIds) throws IOException {
         bookService.deleteBooksById(bookIds);
