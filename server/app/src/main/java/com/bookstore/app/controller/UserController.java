@@ -54,9 +54,9 @@ public class UserController {
     private Long refreshTokenDurationMs;
 
     public UserController(UserService userService, AuthService authService, JWTService jwtService,
-            ImageService imageService, RefreshService refreshService,
-            VerificationService verificationService, AuthorService authorService,
-            BookService bookService) {
+                          ImageService imageService, RefreshService refreshService,
+                          VerificationService verificationService, AuthorService authorService,
+                          BookService bookService) {
         this.userService = userService;
         this.authService = authService;
         this.jwtService = jwtService;
@@ -69,7 +69,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody User user,
-            HttpServletResponse response) {
+                                                     HttpServletResponse response) {
         AuthResponse authResponse = authService.verify(user);
         Cookie refreshCookie = new Cookie("refreshToken", authResponse.getRefreshToken());
         refreshCookie.setHttpOnly(true);
@@ -106,7 +106,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO user, BindingResult result,
-            HttpServletResponse response) {
+                                        HttpServletResponse response) {
         if (result.hasErrors()) {
             List<String> errors = result.getAllErrors().stream().map(ObjectError::getDefaultMessage)
                     .collect(Collectors.toList());
@@ -133,7 +133,7 @@ public class UserController {
 
     @PostMapping("/image_upload")
     public ResponseEntity<Image> uploadUserImage(@RequestParam("file") MultipartFile file,
-            Principal principal) throws IOException {
+                                                 Principal principal) throws IOException {
         Image image = imageService.modifyImage(principal.getName(), file);
         return ResponseEntity.ok(image);
     }

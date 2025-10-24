@@ -2,11 +2,12 @@ package com.bookstore.app.service;
 
 import com.bookstore.app.model.Book;
 import com.bookstore.app.model.BookImage;
+import com.bookstore.app.model.CloudinaryUploadResponse;
 import com.bookstore.app.repo.BookImageRepo;
-import java.io.IOException;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class BookImageService {
@@ -19,10 +20,10 @@ public class BookImageService {
     }
 
     public BookImage saveBookImage(MultipartFile file, Book book) throws IOException {
-        Map uploadResult = cloudinaryService.uploadFile(file);
+        CloudinaryUploadResponse uploadResult = cloudinaryService.uploadFile(file);
 
-        String publicId = (String) uploadResult.get("public_id");
-        String url = (String) uploadResult.get("secure_url");
+        String publicId = uploadResult.getPublicId();
+        String url = uploadResult.getSecureUrl();
 
         BookImage bookImage = new BookImage();
         bookImage.setPublicId(publicId);

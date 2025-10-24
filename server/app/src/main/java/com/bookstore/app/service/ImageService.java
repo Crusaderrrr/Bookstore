@@ -1,16 +1,17 @@
 package com.bookstore.app.service;
 
+import com.bookstore.app.model.CloudinaryUploadResponse;
 import com.bookstore.app.model.Image;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.ImageRepo;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ImageService {
@@ -19,7 +20,7 @@ public class ImageService {
     private final UserService userService;
 
     public ImageService(ImageRepo imageRepo, CloudinaryService cloudinaryService,
-            UserService userService) {
+                        UserService userService) {
         this.imageRepo = imageRepo;
         this.cloudinaryService = cloudinaryService;
         this.userService = userService;
@@ -27,9 +28,9 @@ public class ImageService {
 
     public Image addImage(String username, MultipartFile file) throws IOException {
         User user = userService.findByUsername(username);
-        Map imageData = cloudinaryService.uploadFile(file);
-        String publicId = imageData.get("public_id").toString();
-        String imageUrl = imageData.get("secure_url").toString();
+        CloudinaryUploadResponse imageData = cloudinaryService.uploadFile(file);
+        String publicId = imageData.getPublicId();
+        String imageUrl = imageData.getSecureUrl();
         Image image = new Image();
         image.setPublicId(publicId);
         image.setUrl(imageUrl);
@@ -53,9 +54,9 @@ public class ImageService {
         if (existingImageOpt.isPresent()) {
             Image image = existingImageOpt.get();
             cloudinaryService.deleteFile(image.getPublicId());
-            Map imageData = cloudinaryService.uploadFile(file);
-            String newPublicId = imageData.get("public_id").toString();
-            String newUrl = imageData.get("secure_url").toString();
+            CloudinaryUploadResponse imageData = cloudinaryService.uploadFile(file);
+            String newPublicId = imageData.getPublicId();
+            String newUrl = imageData.getSecureUrl();
 
             image.setPublicId(newPublicId);
             image.setUrl(newUrl);
