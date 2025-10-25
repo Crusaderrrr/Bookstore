@@ -4,10 +4,9 @@ import com.bookstore.app.model.Book;
 import com.bookstore.app.model.BookImage;
 import com.bookstore.app.model.CloudinaryUploadResponse;
 import com.bookstore.app.repo.BookImageRepo;
+import java.io.IOException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 @Service
 public class BookImageService {

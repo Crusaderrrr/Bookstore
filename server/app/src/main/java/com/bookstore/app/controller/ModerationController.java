@@ -8,15 +8,20 @@ import com.bookstore.app.model.ModerationRequest;
 import com.bookstore.app.service.AuthorService;
 import com.bookstore.app.service.CloudinaryService;
 import com.bookstore.app.service.ModerationService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/moderation")
@@ -44,15 +49,18 @@ public class ModerationController {
     @GetMapping
     public ResponseEntity<List<ModerationRequestDTO>> getMyModerationRequests(Principal principal) {
         List<ModerationRequestDTO> requests =
-                moderationService.finAllRequestsByUsername(principal.getName());
+                moderationService.findAllRequestsByUsername(principal.getName());
         return ResponseEntity.ok(requests);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('AUTHOR')")
     public ResponseEntity<String> createModerationRequest(@RequestParam MultipartFile image,
-                                                          @RequestParam String title, @RequestParam String description,
-                                                          @RequestParam double price, @RequestParam String genre, Principal principal)
+                                                          @RequestParam String title,
+                                                          @RequestParam String description,
+                                                          @RequestParam double price,
+                                                          @RequestParam String genre,
+                                                          Principal principal)
             throws IOException {
         CloudinaryUploadResponse imageData = cloudinaryService.uploadFile(image);
         ModerationRequest request = new ModerationRequest();

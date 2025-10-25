@@ -1,10 +1,11 @@
 package com.bookstore.app.controller;
 
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,16 +44,17 @@ public class AdminControllerTests {
     @Test
     public void deleteUserWithImagesShouldReturnOk() throws Exception {
         List<Integer> userIds = Arrays.asList(1, 2, 3);
+        String expectedResponse = "Users deleted";
 
-        when(imageService.findImageByUserId(1)).thenReturn(new Image());
+        when(imageService.findImageByUserId(1)).thenReturn(mock(Image.class));
         when(imageService.findImageByUserId(2)).thenReturn(null);
         when(imageService.findImageByUserId(3)).thenReturn(null);
 
         doNothing().when(imageService).deleteImageByUserId(1);
         doNothing().when(userService).deleteUsersById(userIds);
 
-        mockMvc.perform(post("/users/delete").contentType(MediaType.APPLICATION_JSON)
-                .content(userIds.toString())).andExpect(status().isOk())
+        mockMvc.perform(delete("/users/delete").contentType(MediaType.APPLICATION_JSON)
+                        .content(userIds.toString())).andExpect(status().isOk())
                 .andExpect(content().string("User deleted"));
 
         verify(imageService).deleteImageByUserId(1);

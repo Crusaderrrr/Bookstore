@@ -79,7 +79,7 @@ public class UserControllerTests {
         when(userService.findByUsername("testuser")).thenReturn(savedUser);
 
         mockMvc.perform(
-                post("/users/login").content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
+                        post("/users/login").content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value("accessToken"))
                 .andExpect(jsonPath("$.role").value("ROLE_USER"))
@@ -108,7 +108,7 @@ public class UserControllerTests {
         when(jwtService.generateToken(savedUser)).thenReturn("accessToken");
 
         mockMvc.perform(
-                post("/users/new").content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
+                        post("/users").content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value("accessToken"))
                 .andExpect(cookie().exists("refreshToken"))
@@ -124,7 +124,7 @@ public class UserControllerTests {
         String jsonRequest = objectMapper.writeValueAsString(userDTO);
 
         mockMvc.perform(
-                post("/users/new").content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
+                        post("/users/new").content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
 

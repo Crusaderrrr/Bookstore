@@ -4,7 +4,6 @@ import com.bookstore.app.dto.ModerationRequestDTO;
 import com.bookstore.app.model.Author;
 import com.bookstore.app.model.Book;
 import com.bookstore.app.model.BookImage;
-import com.bookstore.app.model.Genre;
 import com.bookstore.app.model.ModerationRequest;
 import com.bookstore.app.model.ModerationStatus;
 import com.bookstore.app.repo.ModerationRequestRepo;
@@ -22,8 +21,8 @@ public class ModerationService {
     private final CloudinaryService cloudinaryService;
 
     public ModerationService(ModerationRequestRepo moderationRequestRepo, BookService bookService,
-            AuthorService authorService, BookImageService bookImageService,
-            CloudinaryService cloudinaryService) {
+                             AuthorService authorService, BookImageService bookImageService,
+                             CloudinaryService cloudinaryService) {
         this.moderationRequestRepo = moderationRequestRepo;
         this.bookService = bookService;
         this.authorService = authorService;
@@ -77,7 +76,7 @@ public class ModerationService {
         moderationRequestRepo.deleteById(id);
     }
 
-    public List<ModerationRequestDTO> finAllRequestsByUsername(String username) {
+    public List<ModerationRequestDTO> findAllRequestsByUsername(String username) {
         Author author = authorService.getAuthorByUsername(username);
         List<ModerationRequest> requests = moderationRequestRepo.findByAuthor(author);
         return requests.stream().map(ModerationRequest::toDTO).toList();
