@@ -21,18 +21,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
+    private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList("/hello",
+            "/users/login", "/refresh_token", "/books/*");
     @Autowired
     private JWTService jwtService;
-
     @Autowired
     private ApplicationContext context;
 
-    private static final List<String> PUBLIC_ENDPOINTS = Arrays.asList("/hello",
-            "/users/login", "/refresh_token", "/books");
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         String token = null;
         String username = null;
@@ -45,9 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            System.out.println(token);
             username = jwtService.extractUsername(token);
-            System.out.println(username);
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
