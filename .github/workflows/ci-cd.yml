@@ -12,5 +12,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - name: Run tests
-        run: pwd
+        run: mvn test
+        working-directory: server/app
 
