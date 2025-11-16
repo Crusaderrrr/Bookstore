@@ -32,4 +32,4 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build and test
-        run: mvn -X verify
+        run: mvn -B verify -Pci
