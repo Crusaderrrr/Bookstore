@@ -119,5 +119,5 @@ jobs:
           script: |
             cd ~/Bookstore
             docker login ghcr.io -u crusaderrrr --password-stdin <<< "${{ secrets.GHCR_TOKEN }}"
-            docker compose pull
-            docker compose up -d --remove-orphans
+            sudo docker-compose pull
+            sudo docker compose up -d --remove-orphans
