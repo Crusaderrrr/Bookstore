@@ -104,3 +104,20 @@ jobs:
           push: true
           tags: |
             ghcr.io/crusaderrrr/my-postgres-db:latest
+
+  deploy_to_ec2:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: build_and_push_images
+    steps:
+      - name: Execute remote deploy via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/Bookstore
+            docker login ghcr.io -u crusaderrrr --password-stdin <<< "${{ secrets.GHCR_TOKEN }}"
+            docker compose pull
+            docker compose up -d --remove-orphans
