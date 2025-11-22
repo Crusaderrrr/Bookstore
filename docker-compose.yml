@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: my-postgres-db:latest
+    image: ghcr.io/crusaderrrr/my-postgres-db:latest
     container_name: postgres_db
     restart: unless-stopped
     environment:

@@ -95,3 +95,12 @@ jobs:
           push: true
           tags: |
             ghcr.io/crusaderrrr/bookstore-frontend:moderation-and-filters
+
+      - name: Build and push db image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          file: ./database/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/crusaderrrr/my-postgres-db:latest
