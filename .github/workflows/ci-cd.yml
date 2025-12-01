@@ -1,8 +1,9 @@
-name: CI - Tests and checks
+name: CI - CD
 on:
   push:
-    - main
-    - moderation-and-filters
+    branches:
+      - main
+      - moderation-and-filters
 
 jobs:
   backend:
