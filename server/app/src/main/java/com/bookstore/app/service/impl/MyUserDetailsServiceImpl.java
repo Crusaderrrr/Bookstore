@@ -3,12 +3,11 @@ package com.bookstore.app.service.impl;
 import com.bookstore.app.model.MyUserDetails;
 import com.bookstore.app.model.User;
 import com.bookstore.app.repo.UserRepo;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MyUserDetailsServiceImpl implements UserDetailsService {
