@@ -1,8 +1,8 @@
-name: ci-cd.yml
+name: CI - Tests and checks
 on:
   push:
-    branches:
-      - moderation-and-filters
+    - main
+    - moderation-and-filters
 
 jobs:
   backend:
@@ -59,11 +59,9 @@ jobs:
 
   build_and_push_images:
     name: Build and push Docker images
+    needs: [ backend, frontend ]
+    if: github.ref == 'ref/heads/main'
     runs-on: ubuntu-latest
-    needs:
-      - backend
-      - frontend
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -109,6 +107,7 @@ jobs:
     name: Deploy to EC2
     runs-on: ubuntu-latest
     needs: build_and_push_images
+    if: github.ref == 'ref/heads/main'
     steps:
       - name: Execute remote deploy via SSH
         uses: appleboy/ssh-action@v0.1.7
