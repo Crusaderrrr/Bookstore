@@ -59,7 +59,7 @@ public class ModerationController {
                                                           @RequestParam String title,
                                                           @RequestParam String description,
                                                           @RequestParam double price,
-                                                          @RequestParam String genre,
+                                                          @RequestParam Genre genre,
                                                           Principal principal)
             throws IOException {
         CloudinaryUploadResponse imageData = cloudinaryService.uploadFile(image);
@@ -67,7 +67,7 @@ public class ModerationController {
         request.setTitle(title);
         request.setDescription(description);
         request.setPrice(price);
-        request.setGenre(Genre.valueOf(genre));
+        request.setGenre(genre);
         request.setAuthor(authorService.getAuthorByUsername(principal.getName()));
         request.setImagePublicId(imageData.getPublicId());
         request.setImageUrl(imageData.getSecureUrl());

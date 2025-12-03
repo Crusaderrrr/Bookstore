@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -47,6 +44,14 @@ public class Book {
     @JoinColumn(name = "author_id")
     @JsonBackReference
     private Author author;
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true,
+            orphanRemoval = true)
+    @JsonManagedReference
+    private BookImage bookImage;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id", nullable = false)
+    private Genre genre;
 
     @JsonProperty("authorInfo")
     public Map<String, String> getAuthorInfo() {
@@ -55,13 +60,4 @@ public class Book {
         info.put("surname", author.getSurname());
         return info;
     }
-
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true,
-            orphanRemoval = true)
-    @JsonManagedReference
-    private BookImage bookImage;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Genre genre;
 }

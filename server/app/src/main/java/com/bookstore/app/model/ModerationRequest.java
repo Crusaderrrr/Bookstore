@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -45,8 +46,8 @@ public class ModerationRequest {
     @Column(nullable = false)
     private ModerationStatus status = ModerationStatus.PENDING;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "genre_id", nullable = false)
     private Genre genre;
 
     @CreationTimestamp
@@ -75,7 +76,7 @@ public class ModerationRequest {
         dto.setStatus(request.getStatus().name());
         dto.setCreatedAt(request.getCreatedAt());
         dto.setReason(request.getReason());
-        dto.setGenre(Genre.valueOf(request.getGenre().name()).name());
+        dto.setGenre(request.getGenre().getName());
         dto.setAuthor(authorDTO);
 
         return dto;
