@@ -47,6 +47,8 @@ public class ModerationServiceTests {
 
     @Test
     public void testApproveModerationRequest() {
+        Genre genre = new Genre();
+        genre.setName("FANTASY");
         Long moderationRequestId = 1L;
         ModerationRequest request = new ModerationRequest();
         request.setImagePublicId("publicId");
@@ -54,7 +56,7 @@ public class ModerationServiceTests {
         request.setTitle("title");
         request.setDescription("description");
         request.setPrice(19.99);
-        request.setGenre(Genre.FANTASY);
+        request.setGenre(genre);
 
         Author author = new Author();
         author.setName("author");
@@ -119,6 +121,8 @@ public class ModerationServiceTests {
 
     @Test
     public void testFindAllRequestsByUsername() {
+        Genre genre = new Genre();
+        genre.setName("FANTASY");
         Author author = new Author();
         String username = "username";
         author.setName(username);
@@ -127,13 +131,13 @@ public class ModerationServiceTests {
         request1.setId(1L);
         request1.setTitle("Book 1");
         request1.setStatus(ModerationStatus.PENDING);
-        request1.setGenre(Genre.FANTASY);
+        request1.setGenre(genre);
 
         ModerationRequest request2 = new ModerationRequest();
         request2.setId(2L);
         request2.setTitle("Book 2");
         request2.setStatus(ModerationStatus.APPROVED);
-        request2.setGenre(Genre.FANTASY);
+        request2.setGenre(genre);
 
         List<ModerationRequest> mockRequests = Arrays.asList(request1, request2);
 
