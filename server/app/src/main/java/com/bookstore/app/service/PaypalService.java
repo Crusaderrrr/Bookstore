@@ -1,53 +1,61 @@
 package com.bookstore.app.service;
 
-import java.io.IOException;
-import java.util.Base64;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.cloudinary.json.JSONObject;
-import org.springframework.beans.factory.annotation.Value;
+import com.paypal.api.payments.Amount;
+import com.paypal.api.payments.Payer;
+import com.paypal.api.payments.Payment;
+import com.paypal.api.payments.PaymentExecution;
+import com.paypal.api.payments.RedirectUrls;
+import com.paypal.api.payments.Transaction;
+import com.paypal.base.rest.APIContext;
+import com.paypal.base.rest.PayPalRESTException;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PaypalService {
-    @Value("${paypal.client.id}")
-    private String clientId;
-    @Value("${paypal.client.secret}")
-    private String clientSecret;
-    @Value("${paypal.api.base}")
-    private String apiBase;
+    @Autowired
+    private APIContext apiContext;
 
-    public String getAccessToken() throws IOException {
-        String auth =
-                Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
-        HttpPost post = new HttpPost(apiBase + "/v1/oauth2/token");
-        post.setHeader("Authorization", "Basic " + auth);
-        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
-        post.setEntity(new StringEntity("grant_type=client_credentials"));
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
-            CloseableHttpResponse response = client.execute(post);
-            String json = EntityUtils.toString(response.getEntity());
-            return new JSONObject(json).getString("access_token");
-        }
+    public Payment createPayment(Double total, String currency, String method, String intent,
+                                 String description, String cancelUrl, String successUrl)
+            throws PayPalRESTException {
+
+        Amount amount = new Amount();
+        amount.setCurrency(currency);
+        amount.setTotal(String.format("%.2f", total));
+
+        Transaction transaction = new Transaction();
+        transaction.setDescription(description);
+        transaction.setAmount(amount);
+
+        List<Transaction> transactions = new ArrayList<>();
+        transactions.add(transaction);
+
+        Payer payer = new Payer();
+        payer.setPaymentMethod(method.toUpperCase());
+
+        Payment payment = new Payment();
+        payment.setTransactions(transactions);
+        payment.setPayer(payer);
+        payment.setIntent(intent);
+
+        RedirectUrls redirectUrls = new RedirectUrls();
+        redirectUrls.setCancelUrl(cancelUrl);
+        redirectUrls.setReturnUrl(successUrl);
+        payment.setRedirectUrls(redirectUrls);
+
+        return payment.create(apiContext);
     }
 
-    public boolean captureOrder(String orderId) throws IOException {
-        String token = getAccessToken();
-        HttpPost post = new HttpPost(apiBase + "/v2/checkout/orders/" + orderId + "/capture");
-        post.setHeader("Authorization", "Bearer " + token);
-        post.setHeader("Content-Type", "application/json");
-        try (CloseableHttpClient client = HttpClients.createDefault()) {
-            CloseableHttpResponse response = client.execute(post);
-            String json = EntityUtils.toString(response.getEntity());
-            JSONObject result = new JSONObject(json);
-            return "COMPLETED".equals(
-                    result.optJSONArray("purchase_units").optJSONObject(0)
-                            .optJSONObject("payments").optJSONArray("captures")
-                            .optJSONObject(0).optString("status"));
-        }
+    public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
+        System.out.println("Executing Payment with ID: " + paymentId);
+
+        Payment payment = new Payment();
+        payment.setId(paymentId);
+        PaymentExecution paymentExecution = new PaymentExecution();
+        paymentExecution.setPayerId(payerId);
+        return payment.execute(apiContext, paymentExecution);
     }
 }

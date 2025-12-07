@@ -47,7 +47,8 @@ public class SecurityConfig {
                                 .authenticationEntryPoint(customAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/hello", "/users", "/users/login", "/users/register",
-                                "/users/new", "/refresh_token", "/books/*", "/books")
+                                "/users/new", "/refresh_token", "/books/*", "/books", "/paypal/**",
+                                "/api/paypal/**")
                         .permitAll().anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
