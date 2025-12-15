@@ -1,0 +1,22 @@
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Project users</title>
+</head>
+<body>
+
+<h2>Users who can browse project</h2>
+<p>Project: $projectName ($projectKey)</p>
+
+    #if($allUsersList)
+    <ul>
+        #foreach($u in $allUsersList)
+            <li>$u</li>
+        #end
+    </ul>
+    #else
+    <p>No users found.</p>
+    #end
+
+</body>
+</html>
