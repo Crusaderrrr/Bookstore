@@ -53,7 +53,8 @@ public class SecurityConfig {
                         "/users/login",
                         "/users/register",
                         "/users/new",
-                        "/refresh_token")
+                        "/refresh_token",
+                        "/books/*")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
@@ -84,8 +85,7 @@ public class SecurityConfig {
   @Bean
   public AuthenticationProvider authenticationProvider(
       UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-    DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-    provider.setUserDetailsService(userDetailsService);
+    DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
     provider.setPasswordEncoder(passwordEncoder);
     return provider;
   }

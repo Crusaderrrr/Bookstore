@@ -36,15 +36,15 @@ function SignupPage() {
         username,
         password,
         email,
-        roles: "USER",
-        active: true,
+        roles: "ROLE_USER",
+        active: false,
       });
       setIsLoggedIn(true);
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("userRole", "USER");
       setAlertMessage("Signup successful!");
       setAlertType("success");
-      navigate("/");
+      navigate("/email-confirmation");
     } catch (err) {
       console.error(err);
       setAlertMessage("Error");

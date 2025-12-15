@@ -1,8 +1,10 @@
 package com.bookstore.app.controller;
 
+import com.bookstore.app.model.RefreshToken;
 import com.bookstore.app.model.User;
 import com.bookstore.app.service.JWTService;
 import com.bookstore.app.service.RefreshService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -35,11 +37,12 @@ public class RefreshController {
     }
 
     if (refreshToken == null) {
-      throw new RuntimeException("Refresh token cookie not found");
+      throw new EntityNotFoundException("Refresh token cookie not found");
     }
 
     try {
-      refreshService.verifyExpiration(refreshService.getRefreshToken(refreshToken));
+      RefreshToken token = refreshService.getRefreshToken(refreshToken);
+      refreshService.verifyExpiration(token);
     } catch (Exception e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     }

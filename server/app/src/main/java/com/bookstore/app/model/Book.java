@@ -1,13 +1,22 @@
 package com.bookstore.app.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -29,5 +38,25 @@ public class Book {
   @DateTimeFormat(pattern = "yyyy-MM-dd")
   private LocalDate datePosted;
 
-  @ManyToOne private User author;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id")
+  @JsonBackReference
+  private Author author;
+
+  @JsonProperty("authorInfo")
+  public Map<String, String> getAuthorInfo() {
+    Map<String, String> info = new HashMap<>();
+    info.put("name", author.getName());
+    info.put("surname", author.getSurname());
+    return info;
+  }
+
+  @OneToOne(
+      mappedBy = "book",
+      cascade = CascadeType.ALL,
+      fetch = FetchType.LAZY,
+      optional = true,
+      orphanRemoval = true)
+  @JsonManagedReference
+  private BookImage bookImage;
 }

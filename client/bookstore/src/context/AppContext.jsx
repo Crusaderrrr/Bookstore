@@ -1,4 +1,6 @@
 import React, { createContext, useState, useMemo, useEffect } from "react";
+import { lightTheme, darkTheme } from "../config/theme";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 
 export const AppContext = createContext({
   theme: "light",
@@ -9,7 +11,9 @@ export const AppContext = createContext({
 
 export const ContextProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("accessToken"));
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("accessToken")
+  );
   const [role, setRole] = useState(localStorage.getItem("userRole"));
 
   useEffect(() => {
@@ -20,9 +24,25 @@ export const ContextProvider = ({ children }) => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
-  const value = useMemo(() => ({ theme, toggleTheme, isLoggedIn, setIsLoggedIn, role, setRole }), [theme, isLoggedIn, role]);
+  const muiTheme = useMemo(() => {
+    return theme === "light" ? lightTheme : darkTheme;
+  }, [theme]);
+
+  const value = useMemo(
+    () => ({
+      theme,
+      toggleTheme,
+      isLoggedIn,
+      setIsLoggedIn,
+      role,
+      setRole,
+    }),
+    [theme, isLoggedIn, role]
+  );
 
   return (
-    <AppContext.Provider value={value}>{children}</AppContext.Provider>
+    <AppContext.Provider value={value}>
+      <MuiThemeProvider theme={muiTheme}>{children}</MuiThemeProvider>
+    </AppContext.Provider>
   );
 };

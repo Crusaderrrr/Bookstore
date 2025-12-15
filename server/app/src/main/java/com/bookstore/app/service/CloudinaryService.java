@@ -2,8 +2,6 @@ package com.bookstore.app.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,23 +14,13 @@ public class CloudinaryService {
   @Autowired private Cloudinary cloudinary;
 
   public Map uploadFile(MultipartFile file) throws IOException {
-    File convFile = convertMultiPartToFile(file);
-    Map uploadResult = cloudinary.uploader().upload(convFile, ObjectUtils.emptyMap());
-    convFile.delete(); 
+    byte[] fileBytes = file.getBytes();
+    Map uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.emptyMap());
     return uploadResult;
   }
 
   public Map deleteFile(String publicId) throws IOException {
     Map options = ObjectUtils.asMap("invalidate", true);
     return cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-  }
-
-  private File convertMultiPartToFile(MultipartFile file) throws IOException {
-    File convFile =
-        new File(System.getProperty("java.io.tmpdir") + "/" + file.getOriginalFilename());
-    try (FileOutputStream fos = new FileOutputStream(convFile)) {
-      fos.write(file.getBytes());
-    }
-    return convFile;
   }
 }

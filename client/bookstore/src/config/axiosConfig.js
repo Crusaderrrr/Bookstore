@@ -1,7 +1,8 @@
 import axios from "axios";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: apiUrl,
   withCredentials: true, 
 });
 
@@ -28,11 +29,10 @@ axiosInstance.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          "http://localhost:8080/refresh_token",
+          `${apiUrl}/refresh_token`,
           {},
           { withCredentials: true }
         );
-        console.log(response.data);
         const newAccessToken = response.data.accessToken;
 
         localStorage.setItem("accessToken", newAccessToken);

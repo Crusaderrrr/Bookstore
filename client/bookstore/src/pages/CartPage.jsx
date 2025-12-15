@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Table, Button, Form, ButtonToolbar } from "react-bootstrap";
+import axiosInstance from "../config/axiosConfig";
 
 export default function CartPage() {
-
-  const initialItems = [
-    { id: 1, title: "Book Title 1", quantity: 2, price: 19.99 },
-    { id: 2, title: "Book Title 2", quantity: 1, price: 24.99 },
-    { id: 3, title: "Book Title 3", quantity: 3, price: 15.5 },
-    { id: 4, title: "Another Book", quantity: 1, price: 29.99 },
-  ];
-
-  const [cartItems, setCartItems] = useState(initialItems);
+  const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const response = await axiosInstance.get("/cart/items");
+        setCartItems(response.data);
+      } catch (err) {
+        console.error("Error fetching cart items:", err);
+      }
+    };
+    fetchCartItems();
+  }, []);
 
   const handleSelectItem = (id) => {
     setSelectedItems((prevSelected) =>
@@ -29,11 +34,16 @@ export default function CartPage() {
     }
   };
 
-  const handleDeleteSelected = () => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => !selectedItems.includes(item.id))
-    );
-    setSelectedItems([]);
+  const handleRemoveFromCart = async () => {
+    try {
+      const response = await axiosInstance.post("/cart/remove", selectedItems);
+      if (response.status === 200) {
+        setCartItems(prev => prev.filter(item => !selectedItems.includes(item.book.id)));
+        setSelectedItems([]);
+      }
+    } catch (err) {
+      console.error("Error removing from cart:", err);
+    }
   };
 
   const isAllSelected =
@@ -46,7 +56,7 @@ export default function CartPage() {
       <ButtonToolbar className="mb-3">
         <Button
           variant="danger"
-          onClick={handleDeleteSelected}
+          onClick={handleRemoveFromCart}
           disabled={selectedItems.length === 0}
         >
           Delete Selected
@@ -73,19 +83,19 @@ export default function CartPage() {
         <tbody>
           {cartItems.length > 0 ? (
             cartItems.map((item) => (
-              <tr key={item.id}>
+              <tr key={item.book.id}>
                 <td>
                   <Form.Check
                     type="checkbox"
-                    checked={selectedItems.includes(item.id)}
-                    onChange={() => handleSelectItem(item.id)}
-                    aria-label={`Select ${item.title}`}
+                    checked={selectedItems.includes(item.book.id)}
+                    onChange={() => handleSelectItem(item.book.id)}
+                    aria-label={`Select ${item.book.title}`}
                   />
                 </td>
-                <td>{item.title}</td>
+                <td>{item.book.title}</td>
                 <td>{item.quantity}</td>
-                <td>${item.price.toFixed(2)}</td>
-                <td>${(item.quantity * item.price).toFixed(2)}</td>
+                <td>${item.book.price.toFixed(2)}</td>
+                <td>${(item.quantity * item.book.price).toFixed(2)}</td>
               </tr>
             ))
           ) : (

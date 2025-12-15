@@ -4,7 +4,6 @@ import com.bookstore.app.service.CloudinaryService;
 import java.io.IOException;
 import java.util.Map;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,8 +25,7 @@ public class CloudinaryController {
   }
 
   @PostMapping("/delete")
-  public Map deleteFile(@RequestBody String publicId) throws IOException {
-    return cloudinaryService.deleteFile(
-        "r2ojkovifd321ssu8paa"); // Hardcoded for development purposes
+  public Map deleteFile(@RequestParam("publicId") String publicId) throws IOException {
+    return cloudinaryService.deleteFile(publicId);
   }
 }
