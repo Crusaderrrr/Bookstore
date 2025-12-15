@@ -14,13 +14,14 @@ import lombok.Data;
 @Data
 @Table(name = "book_images")
 public class BookImage {
-  @Id @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long id;
-  private String publicId;
-  private String url;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String publicId;
+    private String url;
 
-  @OneToOne
-  @JoinColumn(name = "book_id")
-  @JsonBackReference
-  private Book book;
+    @OneToOne
+    @JoinColumn(name = "book_id")
+    @JsonBackReference
+    private Book book;
 }

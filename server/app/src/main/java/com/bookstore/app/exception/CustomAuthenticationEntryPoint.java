@@ -9,15 +9,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-  @Override
-  public void commence(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      AuthenticationException authException)
-      throws IOException {
-    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    response.setContentType("application/json");
-    String json = "{\"error\": \"Unauthorized\", \"message\": \"Authentication required\"}";
-    response.getWriter().write(json);
-  }
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException authException) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        String json = "{\"error\": \"Unauthorized\", \"message\": \"Authentication required\"}";
+        response.getWriter().write(json);
+    }
 }

@@ -31,7 +31,7 @@ export default function ShopPage() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axiosInstance.get("/books/all");
+        const response = await axiosInstance.get("/books");
         setItems(response.data);
       } catch (err) {
         console.error("Error fetching books:", err);

@@ -12,34 +12,31 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-  private final AuthenticationManager authManager;
-  private final JWTService jwtService;
-  private final RefreshService refreshService;
-  private final UserService userService;
+    private final AuthenticationManager authManager;
+    private final JWTService jwtService;
+    private final RefreshService refreshService;
+    private final UserService userService;
 
-  public AuthService(
-      AuthenticationManager authManager,
-      JWTService jwtService,
-      RefreshService refreshService,
-      UserService userService) {
-    this.authManager = authManager;
-    this.jwtService = jwtService;
-    this.refreshService = refreshService;
-    this.userService = userService;
-  }
-
-  public AuthResponse verify(User user) {
-    try {
-      Authentication authentication =
-          authManager.authenticate(
-              new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
-
-      User authUser = userService.findByUsername(user.getUsername());
-      String accessToken = jwtService.generateToken(authUser);
-      RefreshToken refToken = refreshService.createRefreshToken(user.getUsername());
-      return new AuthResponse(accessToken, refToken.getToken());
-    } catch (BadCredentialsException ex) {
-      throw new InvalidCredentialsException("Invalid username or password");
+    public AuthService(AuthenticationManager authManager, JWTService jwtService,
+            RefreshService refreshService, UserService userService) {
+        this.authManager = authManager;
+        this.jwtService = jwtService;
+        this.refreshService = refreshService;
+        this.userService = userService;
     }
-  }
+
+    public AuthResponse verify(User user) {
+        try {
+            Authentication authentication =
+                    authManager.authenticate(new UsernamePasswordAuthenticationToken(
+                            user.getUsername(), user.getPassword()));
+
+            User authUser = userService.findByUsername(user.getUsername());
+            String accessToken = jwtService.generateToken(authUser);
+            RefreshToken refToken = refreshService.createRefreshToken(user.getUsername());
+            return new AuthResponse(accessToken, refToken.getToken());
+        } catch (BadCredentialsException ex) {
+            throw new InvalidCredentialsException("Invalid username or password");
+        }
+    }
 }

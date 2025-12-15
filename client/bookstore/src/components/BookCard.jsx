@@ -2,6 +2,7 @@ import React from "react";
 import { Card } from "react-bootstrap";
 import "../style/bookStyle.css";
 import Checkbox from "@mui/material/Checkbox";
+import book_cover from "../assets/book_cover.jpg";
 
 export default function BookCard({
   book,
@@ -9,8 +10,6 @@ export default function BookCard({
   isChecked,
   onCheckboxChange,
 }) {
-  const default_book_cover =
-    "https://res.cloudinary.com/dupcshdti/image/upload/v1759743713/book_cover_rllhzg.jpg";
 
   const handleOpenBookDetails = (id) => {
     window.location.href = `/books/${id}`;
@@ -34,7 +33,7 @@ export default function BookCard({
         <Card.Img
           variant="top"
           alt="Book img"
-          src={book.bookImage?.url || default_book_cover}
+          src={book.bookImage?.url || book_cover}
           className="mt-3"
         />
       </div>

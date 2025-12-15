@@ -1,0 +1,52 @@
+.background-blur {
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, .3);
+}
+
+.search-component {
+  position: relative;
+  margin-right: auto;
+}
+
+.search-container {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-height: 600;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.results-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 500;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 0 32px 0;
+}
+
+.loading-animation {
+  margin-top: 20;
+}
+
+.list-item {
+  cursor: pointer;
+}
+
+.items-not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px 48px 16px;
+}

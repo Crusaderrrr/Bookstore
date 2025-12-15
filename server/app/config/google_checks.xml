@@ -19,7 +19,7 @@
     </module>
 
     <module name="LineLength">
-        <property name="max" value="113"/>
+        <property name="max" value="100"/>
         <property name="ignorePattern" value="^package.*|^import.*|http://|https://|ftp://"/>
     </module>
 

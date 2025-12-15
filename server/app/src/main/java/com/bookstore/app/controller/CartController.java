@@ -6,6 +6,7 @@ import com.bookstore.app.service.CartService;
 import java.security.Principal;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,35 +17,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/cart")
 public class CartController {
-  private final CartService cartService;
+    private final CartService cartService;
 
-  public CartController(CartService cartService) {
-    this.cartService = cartService;
-  }
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
+    }
 
-  @PostMapping("/add")
-  public ResponseEntity<String> addToCart(
-      @RequestParam Long bookId,
-      @RequestParam(defaultValue = "1") int quantity,
-      Principal principal) {
+    @PostMapping
+    public ResponseEntity<String> addToCart(@RequestParam Long bookId,
+            @RequestParam(defaultValue = "1") int quantity, Principal principal) {
 
-    String username = principal.getName();
-    Cart updatedCart = cartService.addToCart(username, bookId, quantity);
+        String username = principal.getName();
+        Cart updatedCart = cartService.addToCart(username, bookId, quantity);
 
-    return ResponseEntity.ok("Book added to cart");
-  }
+        return ResponseEntity.ok("Book added to cart");
+    }
 
-  @GetMapping("/items")
-  public ResponseEntity<List<CartItem>> getCartItems(Principal principal) {
-    List<CartItem> items = cartService.getCartByUsername(principal.getName()).getItems();
+    @GetMapping
+    public ResponseEntity<List<CartItem>> getCartItems(Principal principal) {
+        List<CartItem> items = cartService.getCartByUsername(principal.getName()).getItems();
 
-    return ResponseEntity.ok(items);
-  }
+        return ResponseEntity.ok(items);
+    }
 
-  @PostMapping("/remove")
-  public ResponseEntity<String> removeBooksFromCart(@RequestBody List<Long> bookIds) {
-    cartService.removeFromCart(bookIds);
+    @DeleteMapping
+    public ResponseEntity<String> removeBooksFromCart(@RequestBody List<Long> bookIds) {
+        cartService.removeFromCart(bookIds);
 
-    return ResponseEntity.ok("Books removed from cart");
-  }
+        return ResponseEntity.ok("Books removed from cart");
+    }
 }
