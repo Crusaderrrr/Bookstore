@@ -5,18 +5,70 @@
 </head>
 <body>
 
-<h2>Users who can browse project</h2>
-<p>Project: $projectName ($projectKey)</p>
+    #if($canEdit)
+    <form method="post" action="/jira/plugins/servlet/projectusersservlet">
+        <input type="hidden" name="projectKey" value="$projectKey"/>
 
-    #if($allUsersList)
+        <ul>
+            #foreach($row in $allUsersList)
+                #set($displayName = $row.displayName)
+                #set($groups = $row.groups)
+                #set($username = $row.username)
+
+                <li style="margin-bottom: 1em;">
+                    <strong>$displayName</strong>
+                    <input type="hidden" name="user" value="$username"/>
+
+                    <div>
+                        <p>Existing groups:</p>
+                        #if($groups && $groups.size() > 0)
+                            #foreach($g in $groups)
+                                <label>
+                                    <input type="checkbox" name="group_${username}" value="$g" checked="checked"/>
+                                    $g
+                                </label>
+                            #end
+                        #else
+                            <em>(No groups)</em>
+                        #end
+                    </div>
+
+                    <div style="margin-top: 0.5em;">
+                        <p>Add new groups:</p>
+                        <select name="group_${username}" multiple size="3">
+                            #foreach($g in $allGroups)
+                                #if(!$groups.contains($g))
+                                    <option value="$g">$g</option>
+                                #end
+                            #end
+                        </select>
+                    </div>
+                </li>
+            #end
+        </ul>
+
+        <button type="submit">Save changes</button>
+    </form>
+    #else
     <ul>
-        #foreach($u in $allUsersList)
-            <li>$u</li>
+        #foreach($row in $allUsersList)
+            <li>
+                $row.displayName
+                #set($groups = $row.groups)
+                #if($groups && $groups.size() > 0)
+                    (
+                    #foreach($g in $groups)
+                        $g#if($velocityCount < $groups.size()), #end
+                    #end
+                    )
+                #else
+                    (No groups)
+                #end
+            </li>
         #end
     </ul>
-    #else
-    <p>No users found.</p>
     #end
+
 
 </body>
 </html>
