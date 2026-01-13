@@ -9,12 +9,21 @@ import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.permission.ProjectPermissions;
 import com.atlassian.jira.project.Project;
+import com.atlassian.jira.project.ProjectManager;
 import com.atlassian.jira.security.PermissionManager;
 import com.atlassian.jira.security.groups.GroupManager;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.templaterenderer.TemplateRenderer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
@@ -22,19 +31,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
 
 @Named
 public class ProjectUsersServlet extends HttpServlet {
 
     private final TemplateRenderer templateRenderer;
     private final PermissionManager permissionManager;
+    private final ProjectManager projectManager;
+    private final UserSearchService userSearchService;
 
     @Inject
     public ProjectUsersServlet(@ComponentImport TemplateRenderer templateRenderer,
-                               @ComponentImport PermissionManager permissionManager) {
+                               @ComponentImport PermissionManager permissionManager,
+                               @ComponentImport ProjectManager projectManager,
+                               @ComponentImport UserSearchService userSearchService) {
         this.templateRenderer = templateRenderer;
         this.permissionManager = permissionManager;
+        this.projectManager = projectManager;
+        this.userSearchService = userSearchService;
     }
 
     @Override
@@ -49,7 +63,7 @@ public class ProjectUsersServlet extends HttpServlet {
             return;
         }
 
-        Project project = ComponentAccessor.getProjectManager().getProjectObjByKey(projectKey);
+        Project project = projectManager.getProjectObjByKey(projectKey);
         if (project == null) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.setContentType("text/plain;charset=utf-8");
@@ -60,10 +74,6 @@ public class ProjectUsersServlet extends HttpServlet {
         ApplicationUser currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser();
         boolean canEdit = currentUser != null
                 && permissionManager.hasPermission(ProjectPermissions.ADMINISTER_PROJECTS, project, currentUser);
-
-        PermissionManager permissionManager = ComponentAccessor.getPermissionManager();
-        UserSearchService userSearchService =
-                ComponentAccessor.getComponent(UserSearchService.class);
 
         int limit = 200;
         UserSearchParams params = UserSearchParams.builder()
@@ -96,7 +106,7 @@ public class ProjectUsersServlet extends HttpServlet {
             }
         }
 
-        
+
         Map<String, Object> context = new HashMap<>();
         context.put("projectKey", project.getKey());
         context.put("projectName", project.getName());
@@ -123,7 +133,7 @@ public class ProjectUsersServlet extends HttpServlet {
             return;
         }
 
-        Project project = ComponentAccessor.getProjectManager().getProjectObjByKey(projectKey);
+        Project project = projectManager.getProjectObjByKey(projectKey);
         if (project == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Unknown projectKey: " + projectKey);
             return;
