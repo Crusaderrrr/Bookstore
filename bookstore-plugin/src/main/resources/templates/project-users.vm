@@ -1,74 +1,54 @@
 <html>
 <head>
-    <meta charset="utf-8"/>
-    <title>Project users</title>
+    <title>Project Users</title>
+    <meta name="decorator" content="atl.general"/>
 </head>
 <body>
+<h2>Project Users - $projectKey</h2>
 
-    #if($canEdit)
-    <form method="post" action="/jira/plugins/servlet/projectusersservlet">
-        <input type="hidden" name="projectKey" value="$projectKey"/>
-
-        <ul>
-            #foreach($row in $allUsersList)
-                #set($displayName = $row.displayName)
-                #set($groups = $row.groups)
-                #set($username = $row.username)
-
-                <li style="margin-bottom: 1em;">
-                    <strong>$displayName</strong>
-                    <input type="hidden" name="user" value="$username"/>
-
-                    <div>
-                        <p>Existing groups:</p>
-                        #if($groups && $groups.size() > 0)
-                            #foreach($g in $groups)
-                                <label>
-                                    <input type="checkbox" name="group_${username}" value="$g" checked="checked"/>
-                                    $g
-                                </label>
-                            #end
-                        #else
-                            <em>(No groups)</em>
-                        #end
-                    </div>
-
-                    <div style="margin-top: 0.5em;">
-                        <p>Add new groups:</p>
-                        <select name="group_${username}" multiple size="3">
-                            #foreach($g in $allGroups)
-                                #if(!$groups.contains($g))
-                                    <option value="$g">$g</option>
-                                #end
-                            #end
-                        </select>
-                    </div>
-                </li>
-            #end
-        </ul>
-
-        <button type="submit">Save changes</button>
-    </form>
-    #else
-    <ul>
-        #foreach($row in $allUsersList)
-            <li>
-                $row.displayName
-                #set($groups = $row.groups)
-                #if($groups && $groups.size() > 0)
-                    (
-                    #foreach($g in $groups)
-                        $g#if($velocityCount < $groups.size()), #end
-                    #end
-                    )
-                #else
-                    (No groups)
-                #end
-            </li>
+    #if ($errors && $errors.size() > 0)
+    <div class="aui-message aui-message-error">
+        #foreach ($error in $errors)
+            <p>$error</p>
         #end
-    </ul>
+    </div>
     #end
 
-
+    #if ($allUsersList && $allUsersList.size() > 0)
+    <table class="aui">
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Display Name</th>
+            <th>Groups</th>
+            #if ($canEdit)
+                <th>Actions</th>
+            #end
+        </tr>
+        </thead>
+        <tbody>
+            #foreach($row in $allUsersList)
+            <tr>
+                <td>$row.name</td>
+                <td>$row.displayName</td>
+                <td>
+                    #foreach($g in $row.groups)
+                        $g#if($velocityCount < $row.groups.size()), #end
+                    #end
+                </td>
+                #if ($canEdit)
+                    <td>
+                        <a href="$req.contextPath/secure/EditUserGroupsAction!default.jspa?username=$row.name&projectKey=$projectKey">
+                            Edit
+                        </a>
+                    </td>
+                #end
+            </tr>
+            #end
+        </tbody>
+    </table>
+    #else
+    <p>No users found.</p>
+    #end
 </body>
 </html>
