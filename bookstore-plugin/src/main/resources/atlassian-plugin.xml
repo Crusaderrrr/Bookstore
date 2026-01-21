@@ -1,46 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2"> 
-  <plugin-info> 
-    <description>${project.description}</description>  
-    <version>${project.version}</version>  
-    <vendor name="${project.organization.name}" url="${project.organization.url}"/>  
-    <param name="plugin-icon">images/pluginIcon.png</param>  
-    <param name="plugin-logo">images/pluginLogo.png</param> 
-  </plugin-info>  
-  <resource type="i18n" name="i18n" location="bookstore-plugin"/>  
-  <web-item key="bookstore-project-users-item" name="Project users" section="jira.project.sidebar.plugins.navigation" weight="10"> 
-    <label key="bookstore.project.users.label">Project users</label>  
-    <link linkId="bookstore-project-users-link">/secure/ProjectUsersAction!default.jspa?projectKey=$pathEncodedProjectKey</link>
-  </web-item>  
-  <web-resource key="bookstore-plugin-resources" name="bookstore-plugin Web Resources"> 
-    <dependency>com.atlassian.auiplugin:ajs</dependency>  
-    <resource type="download" name="bookstore-plugin.css" location="/css/bookstore-plugin.css"/>  
-    <resource type="download" name="bookstore-plugin.js" location="/js/bookstore-plugin.js"/>  
-    <resource type="download" name="images/" location="/images"/>  
-    <context>bookstore-plugin</context> 
-  </web-resource>
-  <resource type="velocity" name="project-users-view" location="templates/project-users.vm"/>  
-  <webwork1 key="project-users-webwork"
-            name="Project Users WebWork"
-            class="java.lang.Object"
-            roles-required="use">
-    <description key="project-users-web-work.description">The Project Users WebWork Plugin</description>  
-    <actions> 
-      <action name="com.bookstore.jira.jira.webwork.ProjectUsersAction" alias="ProjectUsersAction"> 
-        <view name="success">/templates/project-users.vm</view>
-      </action> 
-    </actions> 
-  </webwork1>  
-  <webwork1 key="edit-user-groups-action"
-            name="Edit User Groups Action"
-            class="java.lang.Object"
-            roles-required="admin">
-    <description key="edit-user-groups-action.description">The Edit User Groups Action Plugin</description>  
-    <actions> 
-      <action name="com.bookstore.jira.jira.webwork.EditUserGroupsAction" alias="EditUserGroupsAction"> 
-        <view name="success">/templates/edit-user-groups.vm</view> 
-      </action> 
-    </actions> 
-  </webwork1>
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+    <plugin-info>
+        <description>${project.description}</description>
+        <version>${project.version}</version>
+        <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+        <param name="plugin-icon">images/pluginIcon.png</param>
+        <param name="plugin-logo">images/pluginLogo.png</param>
+    </plugin-info>
+    <resource type="i18n" name="i18n" location="bookstore-plugin"/>
+    <web-item key="bookstore-project-users-item" name="Project users" section="jira.project.sidebar.plugins.navigation"
+              weight="10">
+        <label key="bookstore.project.users.label">Project users</label>
+        <link linkId="bookstore-project-users-link">
+            /projects/$pathEncodedProjectKey?selectedItem=${atlassian.plugin.key}:bookstore-project-users&amp;projectKey=$pathEncodedProjectKey
+        </link>
+    </web-item>
+    <web-resource key="bookstore-plugin-resources" name="bookstore-plugin Web Resources">
+        <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <resource type="download" name="bookstore-plugin.css" location="/css/bookstore-plugin.css"/>
+        <resource type="download" name="bookstore-plugin.js" location="/js/bookstore-plugin.js"/>
+        <resource type="download" name="images/" location="/images"/>
+        <context>bookstore-plugin</context>
+    </web-resource>
+    <webwork1 key="edit-user-groups-action" name="Edit User Groups Action" class="java.lang.Object"
+              roles-required="admin">
+        <description key="edit-user-groups-action.description">The Edit User Groups Action Plugin</description>
+        <actions>
+            <action name="com.bookstore.jira.jira.webwork.EditUserGroupsAction" alias="EditUserGroupsAction">
+                <view name="success">/templates/edit-user-groups.vm</view>
+            </action>
+        </actions>
+    </webwork1>
+    <web-panel name="List of users" key="bookstore-users-list-panel"
+               location="${atlassian.plugin.key}:bookstore-project-users" weight="1000">
+        <description key="listofusers.description">Shows all users who can browse the project</description>
+        <context-provider class="com.bookstore.jira.context.UsersListContextProvider"/>
+        <resource name="view" type="velocity" location="templates/project-users.vm"/>
+    </web-panel>
 </atlassian-plugin>

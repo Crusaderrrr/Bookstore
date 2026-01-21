@@ -6,14 +6,6 @@
 <body>
 <h2>Project Users - $projectKey</h2>
 
-    #if ($errors && $errors.size() > 0)
-    <div class="aui-message aui-message-error">
-        #foreach ($error in $errors)
-            <p>$error</p>
-        #end
-    </div>
-    #end
-
     #if ($allUsersList && $allUsersList.size() > 0)
     <table class="aui">
         <thead>
@@ -38,7 +30,7 @@
                 </td>
                 #if ($canEdit)
                     <td>
-                        <a href="$req.contextPath/secure/EditUserGroupsAction!default.jspa?username=$row.name&projectKey=$projectKey">
+                        <a href="$contextPath/secure/EditUserGroupsAction!default.jspa?username=$row.name&amp;projectKey=$projectKey">
                             Edit
                         </a>
                     </td>
