@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>Edit user's groups</title>
+    <meta name="decorator" content="atl.general"/>
+</head>
+<body>
+    <h2>User: $username</h2>
+
+    <form method="post" action="$req.contextPath/secure/EditUserGroupsAction!update.jspa">
+    <fieldset>
+            <legend>Groups</legend>
+            #foreach ($group in $allGroups)
+                #set($isChecked = $currentGroups.contains($group))
+                <div>
+                    <label for="group_${velocityCount}">
+                        <input
+                            id="group_${velocityCount}"
+                            type="checkbox"
+                            name="groups"
+                            value="$group"
+                            #if($isChecked) checked="checked"#end
+                        />
+                    $group
+                    </label>
+                </div>
+            #end
+            <input type="hidden" name="username" value="$username"/>
+            <input type="hidden" name="projectKey" value="$projectKey"/>
+            <input type="hidden" name="atl_token" value="$atl_token"/>
+        </fieldset>
+        <button type="submit">Save</button>
+    </form>
+</body>

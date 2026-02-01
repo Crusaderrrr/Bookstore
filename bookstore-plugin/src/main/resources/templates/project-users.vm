@@ -1,0 +1,47 @@
+<html>
+<head>
+    <title>Project Users</title>
+    <meta name="decorator" content="atl.general"/>
+</head>
+<link>
+<h2>Project Users - $projectKey</h2>
+
+    #if ($allUsersList && $allUsersList.size() > 0)
+    <table class="aui">
+        <thead>
+        <tr>
+            <th>Username</th>
+            <th>Display Name</th>
+            <th>Groups</th>
+            #if ($canEdit)
+                <th>Actions</th>
+            #end
+        </tr>
+        </thead>
+        <tbody>
+            #foreach($row in $allUsersList)
+            <tr>
+                <td>$row.name</td>
+                <td>$row.displayName</td>
+                <td>
+                    #foreach($g in $row.groups)
+                        $g#if($velocityCount < $row.groups.size()), #end
+                    #end
+                </td>
+                #if ($canEdit)
+                    <td>
+                        <a href="$contextPath/secure/EditUserGroupsAction!default.jspa?username=$row.name&amp;projectKey=$projectKey">
+                            Edit
+                        </a>
+                    </td>
+                #end
+            </tr>
+            #end
+        </tbody>
+    </table>
+    <a href="$contextPath/secure/DownloadUsersPdfAction!default.jspa" class="aui-button">Download Users PDF</a>
+    #else
+    <p>No users found.</p>
+    #end
+</body>
+</html>
