@@ -3,6 +3,8 @@ package com.bookstore.jira.jira.webwork;
 import com.atlassian.jira.bc.user.search.UserSearchParams;
 import com.atlassian.jira.bc.user.search.UserSearchService;
 import com.atlassian.jira.security.PermissionManager;
+import com.atlassian.jira.security.request.RequestMethod;
+import com.atlassian.jira.security.request.SupportedMethods;
 import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.jira.web.action.JiraWebActionSupport;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
@@ -12,8 +14,10 @@ import com.lowagie.text.pdf.PdfWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+import webwork.action.Action;
 import webwork.action.ServletResponseAware;
 
 public class DownloadUsersPdfAction extends JiraWebActionSupport
@@ -28,11 +32,12 @@ public class DownloadUsersPdfAction extends JiraWebActionSupport
                                   @ComponentImport PermissionManager permissionManager) {
         this.userSearchService = userSearchService;
         this.permissionManager = permissionManager;
+        log.info("DownloadUsersPdfAction created successfully");
     }
 
 
-    @Override
-    public String doExecute() throws Exception {
+    @SupportedMethods({RequestMethod.GET})
+    public String doDefault() throws Exception {
 
         UserSearchParams params = UserSearchParams.builder()
                 .allowEmptyQuery(true)
@@ -49,7 +54,13 @@ public class DownloadUsersPdfAction extends JiraWebActionSupport
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=\"users.pdf\"");
-        return "download";
+
+        try (OutputStream out = response.getOutputStream()) {
+            out.write(pdfBytes);
+            out.flush();
+        }
+
+        return Action.NONE;
     }
 
     private byte[] buildPdf(List<ApplicationUser> users) throws Exception {
@@ -76,7 +87,7 @@ public class DownloadUsersPdfAction extends JiraWebActionSupport
 
         doc.add(table);
 
-        doc.close(); // also closes writer
+        doc.close();
         return baos.toByteArray();
     }
 

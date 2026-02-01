@@ -38,4 +38,11 @@
         <context-provider class="com.bookstore.jira.context.UsersListContextProvider"/>
         <resource name="view" type="velocity" location="templates/project-users.vm"/>
     </web-panel>
+    <webwork1 key="export-users-pdf" name="Export Users PDF" class="java.lang.Object" roles-required="use">
+        <description key="export-users-pdf.description">Exports Users Table in PDF</description>
+        <actions>
+            <action name="com.bookstore.jira.jira.webwork.DownloadUsersPdfAction" alias="DownloadUsersPdfAction">
+            </action>
+        </actions>
+    </webwork1>
 </atlassian-plugin>

@@ -3,7 +3,7 @@
     <title>Project Users</title>
     <meta name="decorator" content="atl.general"/>
 </head>
-<body>
+<link>
 <h2>Project Users - $projectKey</h2>
 
     #if ($allUsersList && $allUsersList.size() > 0)
@@ -39,6 +39,7 @@
             #end
         </tbody>
     </table>
+    <a href="$contextPath/secure/DownloadUsersPdfAction!default.jspa" class="aui-button">Download Users PDF</a>
     #else
     <p>No users found.</p>
     #end
